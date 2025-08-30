@@ -1,6 +1,6 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
 using FoodDonationSystem.Core.Entities;
-using FoodDonationSystem.Core.Interfaces;
+using FoodDonationSystem.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

@@ -1,7 +1,7 @@
 ﻿using FoodDonationSystem.Core.Entities;
 using System.Linq.Expressions;
 
-namespace FoodDonationSystem.Core.Interfaces
+namespace FoodDonationSystem.Core.Interfaces.IRepositories
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {

@@ -1,6 +1,6 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
 
-namespace FoodDonationSystem.Core.Interfaces
+namespace FoodDonationSystem.Core.Interfaces.IServices
 {
     public interface IAuthService
     {

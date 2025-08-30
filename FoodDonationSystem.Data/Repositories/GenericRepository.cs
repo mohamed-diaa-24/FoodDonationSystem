@@ -1,5 +1,5 @@
 ﻿using FoodDonationSystem.Core.Entities;
-using FoodDonationSystem.Core.Interfaces;
+using FoodDonationSystem.Core.Interfaces.IRepositories;
 using FoodDonationSystem.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

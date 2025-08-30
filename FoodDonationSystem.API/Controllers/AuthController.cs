@@ -1,5 +1,5 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
-using FoodDonationSystem.Core.Interfaces;
+using FoodDonationSystem.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodDonationSystem.API.Controllers

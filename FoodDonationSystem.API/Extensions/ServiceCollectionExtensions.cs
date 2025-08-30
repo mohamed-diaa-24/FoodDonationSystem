@@ -1,5 +1,5 @@
 ﻿using FoodDonationSystem.Core.Entities;
-using FoodDonationSystem.Core.Interfaces;
+using FoodDonationSystem.Core.Interfaces.IServices;
 using FoodDonationSystem.Core.Services;
 using FoodDonationSystem.Data.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
