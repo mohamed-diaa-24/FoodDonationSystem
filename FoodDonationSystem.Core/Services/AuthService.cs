@@ -1,5 +1,6 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
 using FoodDonationSystem.Core.Entities;
+using FoodDonationSystem.Core.Extensions;
 using FoodDonationSystem.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -92,18 +93,7 @@ namespace FoodDonationSystem.Core.Services
                     Message = "The account has been created successfully",
                     Token = token,
                     TokenExpiry = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
-                    User = new UserInfoDto
-                    {
-                        Id = user.Id,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email,
-                        PhoneNumber = user.PhoneNumber ?? "",
-                        ProfileImage = user.ProfileImage,
-                        Roles = roles.ToList(),
-                        IsVerified = user.IsVerified,
-                        IsActive = user.IsActive
-                    }
+                    User = user.ToDto(roles.ToList())
                 };
             }
             catch (Exception ex)
@@ -164,18 +154,7 @@ namespace FoodDonationSystem.Core.Services
                     Message = "You have been logged in successfully",
                     Token = token,
                     TokenExpiry = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
-                    User = new UserInfoDto
-                    {
-                        Id = user.Id,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email,
-                        PhoneNumber = user.PhoneNumber ?? "",
-                        ProfileImage = user.ProfileImage,
-                        Roles = roles.ToList(),
-                        IsVerified = user.IsVerified,
-                        IsActive = user.IsActive
-                    }
+                    User = user.ToDto(roles.ToList())
                 };
             }
             catch (Exception ex)
