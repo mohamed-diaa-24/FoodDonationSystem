@@ -15,7 +15,6 @@ namespace FoodDonationSystem.Core.Entities
         public ApprovalStatus Status { get; set; } = ApprovalStatus.Pending;
         public string? RejectionReason { get; set; }
         public bool IsActive { get; set; } = true;
-        public int TotalReceived { get; set; } = 0;
         public CharityType Type { get; set; }
 
         // Navigation Properties

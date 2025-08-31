@@ -6,7 +6,6 @@
         public string? VehicleNumber { get; set; }
         public string? DriverLicense { get; set; }
         public bool IsActive { get; set; } = true;
-        public int CompletedDeliveries { get; set; } = 0;
 
         // Navigation Properties
         public Guid UserId { get; set; }

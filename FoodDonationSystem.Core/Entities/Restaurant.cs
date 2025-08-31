@@ -15,7 +15,6 @@ namespace FoodDonationSystem.Core.Entities
         public string? RejectionReason { get; set; }
         public TimeSpan? PreferredDonationTime { get; set; }
         public bool IsActive { get; set; } = true;
-        public int TotalDonations { get; set; } = 0;
 
         // Navigation Properties
 
