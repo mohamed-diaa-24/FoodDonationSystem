@@ -36,9 +36,6 @@ namespace FoodDonationSystem.Data.Configurations
             builder.Property(e => e.RejectionReason)
                    .HasMaxLength(500);
 
-            builder.Property(e => e.AverageRating)
-                   .HasPrecision(3, 2);
-
             // Relationships - Updated to use ApplicationUser
             builder.HasOne(r => r.User)
                    .WithOne(u => u.Restaurant)

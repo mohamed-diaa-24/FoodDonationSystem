@@ -19,9 +19,6 @@ namespace FoodDonationSystem.Data.Configurations
             builder.Property(e => e.DriverLicense)
                    .HasMaxLength(500);
 
-            builder.Property(e => e.AverageRating)
-                   .HasPrecision(3, 2);
-
             // Relationships
             builder.HasOne(v => v.User)
                    .WithOne(u => u.Volunteer)
