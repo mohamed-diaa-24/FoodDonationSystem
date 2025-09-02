@@ -18,13 +18,9 @@ namespace FoodDonationSystem.Core.Extensions
                 ProfileImage = user.ProfileImage,
                 Roles = roles,
                 IsVerified = user.IsVerified,
-                IsActive = user.IsActive
+
             };
         }
         #endregion
-
-
-
-
     }
 }

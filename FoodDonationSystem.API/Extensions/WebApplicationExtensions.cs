@@ -11,9 +11,10 @@ namespace FoodDonationSystem.API.Extensions
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Food Donation System API V1");
-                    c.RoutePrefix = "swagger"; // Access swagger at /swagger
-                    c.DefaultModelsExpandDepth(-1); // Disable swagger schemas at bottom
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Qoot API V1");
+                    c.RoutePrefix = "swagger";
+                    c.DefaultModelsExpandDepth(-1);
+                    c.DefaultModelExpandDepth(-1);
                     c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
                     c.DisplayRequestDuration();
                 });
@@ -123,23 +124,14 @@ namespace FoodDonationSystem.API.Extensions
         public static WebApplication UseApiEndpoints(this WebApplication app)
         {
             app.MapControllers();
-
-            // Add health check endpoint
-            app.MapGet("/health", () => new
-            {
-                status = "Healthy",
-                timestamp = DateTime.UtcNow,
-                environment = app.Environment.EnvironmentName
-            });
-
             // Add API info endpoint
             app.MapGet("/", () => new
             {
-                name = "Food Donation System API",
+                name = "Qoot API",
                 version = "1.0.0",
                 description = "Food Donation Management System",
                 documentation = "/swagger"
-            });
+            }).ExcludeFromDescription();
 
             return app;
         }

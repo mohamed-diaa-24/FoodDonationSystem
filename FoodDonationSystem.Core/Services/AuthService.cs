@@ -1,4 +1,5 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
+using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Extensions;
 using FoodDonationSystem.Core.Interfaces.IServices;
@@ -30,7 +31,7 @@ namespace FoodDonationSystem.Core.Services
             _configuration = configuration;
         }
 
-        public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
+        public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
         {
             try
             {
@@ -38,22 +39,14 @@ namespace FoodDonationSystem.Core.Services
                 var existingUser = await _userManager.FindByEmailAsync(request.Email);
                 if (existingUser != null)
                 {
-                    return new AuthResponseDto
-                    {
-                        IsSuccess = false,
-                        Message = "User already exists with this email address"
-                    };
-                }
 
+                    return ApiResponse<AuthResponseDto>.Failure("User already exists with this email address");
+                }
 
                 if (request.Role.ToLower() == "Admin".ToLower() || !await _roleManager.RoleExistsAsync(request.Role))
                 {
 
-                    return new AuthResponseDto
-                    {
-                        IsSuccess = false,
-                        Message = "The  user Role is invalid."
-                    };
+                    return ApiResponse<AuthResponseDto>.Failure("The  user Role is invalid.");
                 }
 
 
@@ -73,11 +66,9 @@ namespace FoodDonationSystem.Core.Services
                 var result = await _userManager.CreateAsync(user, request.Password);
                 if (!result.Succeeded)
                 {
-                    return new AuthResponseDto
-                    {
-                        IsSuccess = false,
-                        Message = string.Join(", ", result.Errors.Select(e => e.Description))
-                    };
+
+                    var message = string.Join(", ", result.Errors.Select(e => e.Description));
+                    return ApiResponse<AuthResponseDto>.Failure(message);
                 }
 
 
@@ -87,26 +78,22 @@ namespace FoodDonationSystem.Core.Services
                 var roles = await _userManager.GetRolesAsync(user);
                 var token = GenerateJwtToken(user.Id, user.Email, roles.ToList());
 
-                return new AuthResponseDto
+                var data = new AuthResponseDto
                 {
-                    IsSuccess = true,
-                    Message = "The account has been created successfully",
                     Token = token,
-                    TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
+                    TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryDays"])),
                     User = user.ToDto(roles.ToList())
                 };
+                return ApiResponse<AuthResponseDto>.Success(data);
+
             }
             catch (Exception ex)
             {
-                return new AuthResponseDto
-                {
-                    IsSuccess = false,
-                    Message = $"An error occurred while creating the account.: {ex.Message}"
-                };
+                return ApiResponse<AuthResponseDto>.Failure($"An error occurred while creating the account.: {ex.Message}");
             }
         }
 
-        public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
+        public async Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginRequestDto request)
         {
             try
             {
@@ -114,32 +101,21 @@ namespace FoodDonationSystem.Core.Services
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null)
                 {
-                    return new AuthResponseDto
-                    {
-                        IsSuccess = false,
-                        Message = "Incorrect email or password"
-                    };
+                    return ApiResponse<AuthResponseDto>.Failure("Incorrect email or password");
                 }
 
 
                 if (!user.IsActive)
                 {
-                    return new AuthResponseDto
-                    {
-                        IsSuccess = false,
-                        Message = "The account is disabled, please contact the administration"
-                    };
+                    return ApiResponse<AuthResponseDto>.Failure("The account is disabled, please contact the administration");
                 }
 
 
                 var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
                 if (!result.Succeeded)
                 {
-                    return new AuthResponseDto
-                    {
-                        IsSuccess = false,
-                        Message = "Incorrect email or password"
-                    };
+
+                    return ApiResponse<AuthResponseDto>.Failure("Incorrect email or password");
                 }
 
 
@@ -148,24 +124,21 @@ namespace FoodDonationSystem.Core.Services
 
                 var token = GenerateJwtToken(user.Id, user.Email, roles.ToList());
 
-                return new AuthResponseDto
+                var data = new AuthResponseDto
                 {
-                    IsSuccess = true,
-                    Message = "You have been logged in successfully",
+
                     Token = token,
-                    TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
+                    TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryDays"])),
                     User = user.ToDto(roles.ToList())
                 };
+                return ApiResponse<AuthResponseDto>.Success(data);
             }
             catch (Exception ex)
             {
-                return new AuthResponseDto
-                {
-                    IsSuccess = false,
-                    Message = $"An error occurred while logging in.: {ex.Message}"
-                };
+                return ApiResponse<AuthResponseDto>.Failure($"An error occurred while logging in.: {ex.Message}");
             }
         }
+
 
         public string GenerateJwtToken(Guid userId, string email, List<string> roles)
         {
@@ -191,7 +164,7 @@ namespace FoodDonationSystem.Core.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddDays(int.Parse(jwtSettings["ExpiryMinutes"])),
+                Expires = DateTime.UtcNow.AddDays(int.Parse(jwtSettings["ExpiryDays"])),
                 Issuer = jwtSettings["Issuer"],
                 Audience = jwtSettings["Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
@@ -203,7 +176,7 @@ namespace FoodDonationSystem.Core.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public async Task<AuthResponseDto> RefreshTokenAsync(string token)
+        public async Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string token)
         {
             // TODO: Implement refresh token logic
             throw new NotImplementedException();

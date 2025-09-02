@@ -1,7 +1,12 @@
-﻿using FoodDonationSystem.Core.Entities;
+﻿using FoodDonationSystem.Core.DTOs.Common;
+using FoodDonationSystem.Core.Entities;
+using FoodDonationSystem.Core.Interfaces;
+using FoodDonationSystem.Core.Interfaces.IRepositories;
 using FoodDonationSystem.Core.Interfaces.IServices;
 using FoodDonationSystem.Core.Services;
 using FoodDonationSystem.Data.Context;
+using FoodDonationSystem.Data.Repositories;
+using FoodDonationSystem.Data.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -97,11 +102,9 @@ namespace FoodDonationSystem.API.Extensions
                         context.HandleResponse();
                         context.Response.StatusCode = 401;
                         context.Response.ContentType = "application/json";
-                        var result = System.Text.Json.JsonSerializer.Serialize(new
-                        {
-                            error = "غير مصرح لك بالوصول",
-                            message = "يجب تسجيل الدخول أولاً"
-                        });
+                        var result = System.Text.Json.JsonSerializer.Serialize(
+                            ApiResponse<string>.Failure("يجب تسجيل الدخول أولاً")
+                            );
                         return context.Response.WriteAsync(result);
                     }
                 };
@@ -118,13 +121,12 @@ namespace FoodDonationSystem.API.Extensions
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "Food Donation System API",
+                    Title = "Qoot API",
                     Version = "v1",
-                    Description = "Food Donation Management System - API Documentation",
+                    Description = "Qoot Management System - API Documentation",
                     Contact = new OpenApiContact
                     {
-                        Name = "Food Donation Team",
-                        Email = "support@fooddonation.com"
+                        Name = "Qoot Team",
                     }
                 });
 
@@ -175,7 +177,6 @@ namespace FoodDonationSystem.API.Extensions
                           .AllowAnyHeader();
                 });
 
-                // You can add more specific policies for production
                 options.AddPolicy("Production", policy =>
                 {
                     policy.WithOrigins("https://Myfrontend.com")
@@ -193,7 +194,7 @@ namespace FoodDonationSystem.API.Extensions
         {
             // Authentication Services
             services.AddScoped<IAuthService, AuthService>();
-
+            services.AddScoped<IRestaurantService, RestaurantService>();
 
             return services;
         }
@@ -224,9 +225,22 @@ namespace FoodDonationSystem.API.Extensions
                 };
             });
 
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
             return services;
         }
 
+        public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
+        {
+            // Register Unit of Work
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            return services;
+        }
 
         public static IServiceCollection AddAllServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -234,6 +248,7 @@ namespace FoodDonationSystem.API.Extensions
                     .AddDatabaseServices(configuration)
                     .AddIdentityServices()
                     .AddJwtAuthentication(configuration)
+                    .AddRepositoryServices()
                     .AddSwaggerDocumentation()
                     .AddCorsPolicy()
                     .AddApplicationServices();
