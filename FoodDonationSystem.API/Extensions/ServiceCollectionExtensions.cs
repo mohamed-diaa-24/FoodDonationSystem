@@ -1,12 +1,10 @@
 ﻿using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.Entities;
-using FoodDonationSystem.Core.Interfaces;
 using FoodDonationSystem.Core.Interfaces.IRepositories;
 using FoodDonationSystem.Core.Interfaces.IServices;
 using FoodDonationSystem.Core.Services;
 using FoodDonationSystem.Data.Context;
 using FoodDonationSystem.Data.Repositories;
-using FoodDonationSystem.Data.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -236,7 +234,7 @@ namespace FoodDonationSystem.API.Extensions
         public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
         {
             // Register Unit of Work
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             return services;

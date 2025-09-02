@@ -1,6 +1,5 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
 using FoodDonationSystem.Core.DTOs.Common;
-using FoodDonationSystem.Core.DTOs.Restaurant;
 using FoodDonationSystem.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +25,7 @@ namespace FoodDonationSystem.API.Controllers
                   .Where(ms => ms.Value.Errors.Count > 0)
                   .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
                   .ToList();
-                return BadRequest(new ApiResponse<CreateRestaurantDto>
+                return BadRequest(new ApiResponse<RegisterRequestDto>
                 {
                     Errors = errorList,
                     Message = "برجاء ملئ البيانات"
@@ -53,7 +52,7 @@ namespace FoodDonationSystem.API.Controllers
                   .Where(ms => ms.Value.Errors.Count > 0)
                   .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
                   .ToList();
-                return BadRequest(new ApiResponse<CreateRestaurantDto>
+                return BadRequest(new ApiResponse<LoginRequestDto>
                 {
                     Errors = errorList
                 });
