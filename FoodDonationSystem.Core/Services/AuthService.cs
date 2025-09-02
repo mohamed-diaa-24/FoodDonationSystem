@@ -92,7 +92,7 @@ namespace FoodDonationSystem.Core.Services
                     IsSuccess = true,
                     Message = "The account has been created successfully",
                     Token = token,
-                    TokenExpiry = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
+                    TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
                     User = user.ToDto(roles.ToList())
                 };
             }
@@ -153,7 +153,7 @@ namespace FoodDonationSystem.Core.Services
                     IsSuccess = true,
                     Message = "You have been logged in successfully",
                     Token = token,
-                    TokenExpiry = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
+                    TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
                     User = user.ToDto(roles.ToList())
                 };
             }
@@ -191,7 +191,7 @@ namespace FoodDonationSystem.Core.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiryMinutes"])),
+                Expires = DateTime.UtcNow.AddDays(int.Parse(jwtSettings["ExpiryMinutes"])),
                 Issuer = jwtSettings["Issuer"],
                 Audience = jwtSettings["Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
