@@ -13,7 +13,6 @@ namespace FoodDonationSystem.Core.Entities
         public string? CommercialRegister { get; set; }
         public ApprovalStatus Status { get; set; } = ApprovalStatus.Pending;
         public string? RejectionReason { get; set; }
-        public TimeSpan? PreferredDonationTime { get; set; }
         public bool IsActive { get; set; } = true;
 
         // Navigation Properties
