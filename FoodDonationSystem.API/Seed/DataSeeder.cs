@@ -1,6 +1,7 @@
 ﻿using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Data.Context;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodDonationSystem.API.Seed
 {
@@ -15,7 +16,7 @@ namespace FoodDonationSystem.API.Seed
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            await context.Database.EnsureCreatedAsync();
+            await context.Database.MigrateAsync();
 
             await RoleSeeder.SeedAsync(roleManager, logger);
             await RoleSeeder.SeedAdminUser(userManager, logger);
