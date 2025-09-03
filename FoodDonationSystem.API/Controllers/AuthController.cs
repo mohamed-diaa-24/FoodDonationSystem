@@ -81,7 +81,7 @@ namespace FoodDonationSystem.API.Controllers
                 await _authService.LogoutAsync(userId);
             }
 
-            return Ok(new { message = "You have successfully logged out" });
+            return Ok(new { message = "لقد قمت بتسجيل الخروج بنجاح" });
         }
     }
 }

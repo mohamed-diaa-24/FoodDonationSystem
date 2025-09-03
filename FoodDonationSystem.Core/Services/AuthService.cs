@@ -40,13 +40,13 @@ namespace FoodDonationSystem.Core.Services
                 if (existingUser != null)
                 {
 
-                    return ApiResponse<AuthResponseDto>.Failure("User already exists with this email address");
+                    return ApiResponse<AuthResponseDto>.Failure("المستخدم موجود بالفعل بهذا البريد الإلكتروني");
                 }
 
                 if (request.Role.ToLower() == "Admin".ToLower() || !await _roleManager.RoleExistsAsync(request.Role))
                 {
 
-                    return ApiResponse<AuthResponseDto>.Failure("The  user Role is invalid.");
+                    return ApiResponse<AuthResponseDto>.Failure("دور المستخدم غير صالح");
                 }
 
 
@@ -89,7 +89,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<AuthResponseDto>.Failure($"An error occurred while creating the account.: {ex.Message}");
+                return ApiResponse<AuthResponseDto>.Failure($"حدث خطأ أثناء إنشاء الحساب.: {ex.Message}");
             }
         }
 
@@ -101,13 +101,13 @@ namespace FoodDonationSystem.Core.Services
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null)
                 {
-                    return ApiResponse<AuthResponseDto>.Failure("Incorrect email or password");
+                    return ApiResponse<AuthResponseDto>.Failure("لبريد الإلكتروني أو كلمة المرور غير صحيحة");
                 }
 
 
                 if (!user.IsActive)
                 {
-                    return ApiResponse<AuthResponseDto>.Failure("The account is disabled, please contact the administration");
+                    return ApiResponse<AuthResponseDto>.Failure("تم تعطيل الحساب الرجاء التواصل مع الإدارة");
                 }
 
 
@@ -115,7 +115,7 @@ namespace FoodDonationSystem.Core.Services
                 if (!result.Succeeded)
                 {
 
-                    return ApiResponse<AuthResponseDto>.Failure("Incorrect email or password");
+                    return ApiResponse<AuthResponseDto>.Failure("البريد الإلكتروني أو كلمة المرور غير صحيحة");
                 }
 
 
@@ -135,7 +135,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<AuthResponseDto>.Failure($"An error occurred while logging in.: {ex.Message}");
+                return ApiResponse<AuthResponseDto>.Failure($"حدث خطأ أثناء تسجيل الدخول: {ex.Message}");
             }
         }
 

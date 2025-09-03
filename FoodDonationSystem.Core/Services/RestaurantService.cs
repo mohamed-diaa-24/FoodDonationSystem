@@ -23,7 +23,7 @@ namespace FoodDonationSystem.Core.Services
                 var existingRestaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(userId);
                 if (existingRestaurant != null)
                 {
-                    return ApiResponse<RestaurantDto>.Failure("User already has a restaurant registered");
+                    return ApiResponse<RestaurantDto>.Failure("المستخدم لديه مطعم مسجل بالفعل");
                 }
 
                 // Create new restaurant using extension method
@@ -36,11 +36,11 @@ namespace FoodDonationSystem.Core.Services
                 var createdRestaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(userId);
                 var restaurantDto = createdRestaurant!.ToDto();
 
-                return ApiResponse<RestaurantDto>.Success(restaurantDto, "Restaurant registered successfully. Awaiting admin approval.");
+                return ApiResponse<RestaurantDto>.Success(restaurantDto, "تم تسجيل المطعم بنجاح. بانتظار موافقة الإدارة");
             }
             catch (Exception ex)
             {
-                return ApiResponse<RestaurantDto>.Failure($"Error registering restaurant: {ex.Message}");
+                return ApiResponse<RestaurantDto>.Failure($"خطأ في تسجيل المطعم: {ex.Message}");
             }
         }
 
@@ -51,7 +51,7 @@ namespace FoodDonationSystem.Core.Services
                 var restaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(userId);
                 if (restaurant == null)
                 {
-                    return ApiResponse<RestaurantDto>.Failure("Restaurant not found");
+                    return ApiResponse<RestaurantDto>.Failure("لم يتم العثور على المطعم");
                 }
 
                 var restaurantDto = restaurant.ToDto();
@@ -59,7 +59,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<RestaurantDto>.Failure($"Error retrieving restaurant: {ex.Message}");
+                return ApiResponse<RestaurantDto>.Failure($"خطأ في استرداد المطعم: {ex.Message}");
             }
         }
 
@@ -70,7 +70,7 @@ namespace FoodDonationSystem.Core.Services
                 var restaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(userId);
                 if (restaurant == null)
                 {
-                    return ApiResponse<RestaurantDto>.Failure("Restaurant not found");
+                    return ApiResponse<RestaurantDto>.Failure("لم يتم العثور على المطعم");
                 }
 
                 // Update restaurant using extension method
@@ -80,11 +80,11 @@ namespace FoodDonationSystem.Core.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 var restaurantDto = restaurant.ToDto();
-                return ApiResponse<RestaurantDto>.Success(restaurantDto, "Restaurant updated successfully");
+                return ApiResponse<RestaurantDto>.Success(restaurantDto, "تم تحديث المطعم بنجاح");
             }
             catch (Exception ex)
             {
-                return ApiResponse<RestaurantDto>.Failure($"Error updating restaurant: {ex.Message}");
+                return ApiResponse<RestaurantDto>.Failure($"حدث خطأ أثناء تحديث المطعم: {ex.Message}");
             }
         }
 
@@ -102,7 +102,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<PagedResult<RestaurantDto>>.Failure($"Error retrieving nearby restaurants: {ex.Message}");
+                return ApiResponse<PagedResult<RestaurantDto>>.Failure($"حدث خطأ أثناء استرداد المطاعم القريبة: {ex.Message}");
             }
         }
 
@@ -117,7 +117,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<IEnumerable<RestaurantDto>>.Failure($"Error retrieving restaurants with donations: {ex.Message}");
+                return ApiResponse<IEnumerable<RestaurantDto>>.Failure($"حدث خطأ أثناء استرداد المطاعم التي تحتوي على تبرعات: {ex.Message}");
             }
         }
 
@@ -128,15 +128,15 @@ namespace FoodDonationSystem.Core.Services
                 var result = await _unitOfWork.Restaurants.UpdateStatusAsync(restaurantId, status, rejectionReason);
                 if (!result)
                 {
-                    return ApiResponse<bool>.Failure("Restaurant not found");
+                    return ApiResponse<bool>.Failure("لم يتم العثور على المطعم");
                 }
 
                 await _unitOfWork.SaveChangesAsync();
-                return ApiResponse<bool>.Success(true, "Restaurant status updated successfully");
+                return ApiResponse<bool>.Success(true, "تم تحديث حالة المطعم بنجاح");
             }
             catch (Exception ex)
             {
-                return ApiResponse<bool>.Failure($"Error updating restaurant status: {ex.Message}");
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء تحديث حالة المطعم: {ex.Message}");
             }
         }
 
@@ -160,7 +160,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<PagedResult<RestaurantDto>>.Failure($"Error retrieving restaurants: {ex.Message}");
+                return ApiResponse<PagedResult<RestaurantDto>>.Failure($"خطأ في استرداد المطاعم: {ex.Message}");
             }
         }
     }
