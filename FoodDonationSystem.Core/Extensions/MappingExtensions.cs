@@ -61,8 +61,6 @@ namespace FoodDonationSystem.Core.Extensions
                 Address = dto.Address,
                 Latitude = dto.Latitude,
                 Longitude = dto.Longitude,
-                LicenseDocument = dto.LicenseDocument,
-                CommercialRegister = dto.CommercialRegister,
                 Status = ApprovalStatus.Pending,
                 IsActive = true,
             };

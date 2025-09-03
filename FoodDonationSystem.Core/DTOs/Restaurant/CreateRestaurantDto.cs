@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace FoodDonationSystem.Core.DTOs.Restaurant
 {
@@ -21,8 +22,15 @@ namespace FoodDonationSystem.Core.DTOs.Restaurant
         [Range(-180, 180, ErrorMessage = "خط الطول غير صالح")]
         public double Longitude { get; set; }
 
-        public string? LicenseDocument { get; set; }
-        public string? CommercialRegister { get; set; }
+        [Required(ErrorMessage = "ملف الترخيص مطلوب")]
+        public IFormFile LicenseDocument { get; set; } = default!;
+
+        [Required(ErrorMessage = "السجل التجاري مطلوب")]
+        public IFormFile CommercialRegister { get; set; } = default!;
+
+
+        public string? LicensePath { get; set; } = "";
+        public string? RegisterPath { get; set; } = "";
 
     }
 }

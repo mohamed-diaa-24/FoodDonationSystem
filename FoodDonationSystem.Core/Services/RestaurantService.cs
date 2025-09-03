@@ -28,6 +28,8 @@ namespace FoodDonationSystem.Core.Services
 
                 // Create new restaurant using extension method
                 var restaurant = request.ToEntity(userId);
+                restaurant.LicenseDocument = request.LicensePath;
+                restaurant.CommercialRegister = request.RegisterPath;
 
                 await _unitOfWork.Restaurants.AddAsync(restaurant);
                 await _unitOfWork.SaveChangesAsync();

@@ -29,7 +29,7 @@ namespace FoodDonationSystem.API.Controllers
 
         [HttpPost("register")]
         [Authorize(Roles = "Restaurant")]
-        public async Task<IActionResult> RegisterRestaurant([FromBody] CreateRestaurantDto request)
+        public async Task<IActionResult> RegisterRestaurant([FromForm] CreateRestaurantDto request, [FromServices] IFileService fileService)
         {
 
             if (!ModelState.IsValid)
@@ -42,16 +42,29 @@ namespace FoodDonationSystem.API.Controllers
                 {
                     Errors = errorList
                 });
-
             }
+
+            var files = new List<FileUploadItem>
+            {
+                new FileUploadItem { File = request.LicenseDocument, Folder = "Licenses" },
+                new FileUploadItem { File = request.CommercialRegister, Folder = "Registers" }
+            }.Where(f => f.File != null).ToList();
+
+            var savedFiles = await fileService.SaveFilesWithRollbackAsync(files);
+            request.LicensePath = savedFiles.ElementAtOrDefault(0);
+            request.RegisterPath = savedFiles.ElementAtOrDefault(1);
 
             var userId = GetCurrentUserId();
             var result = await _restaurantService.RegisterRestaurantAsync(userId, request);
 
-            if (result.IsSuccess)
-                return Ok(result);
+            if (!result.IsSuccess)
+            {
 
-            return BadRequest(result);
+                fileService.DeleteFiles(savedFiles);
+                return BadRequest(result);
+            }
+
+            return Ok(result);
         }
 
         [HttpGet("my-restaurant")]

@@ -159,6 +159,7 @@ namespace FoodDonationSystem.API.Extensions
 
             app.UseGlobalExceptionHandler();
 
+            app.UseStaticFiles();
 
             app.UseSecurityHeaders();
 

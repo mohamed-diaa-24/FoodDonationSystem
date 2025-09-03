@@ -1,4 +1,5 @@
-﻿using FoodDonationSystem.Core.DTOs.Common;
+﻿using FoodDonationSystem.API.Services;
+using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Interfaces;
 using FoodDonationSystem.Core.Interfaces.IRepositories;
@@ -195,6 +196,7 @@ namespace FoodDonationSystem.API.Extensions
             // Authentication Services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRestaurantService, RestaurantService>();
+            services.AddScoped<IFileService, FileService>();
 
             return services;
         }

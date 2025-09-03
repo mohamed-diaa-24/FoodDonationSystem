@@ -13,6 +13,9 @@
 
   <ItemGroup>
     <Folder Include="Middlewares\" />
+    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\Uploads\Licenses\" />
+    <Folder Include="wwwroot\Uploads\Registers\" />
   </ItemGroup>
 
   <ItemGroup>
