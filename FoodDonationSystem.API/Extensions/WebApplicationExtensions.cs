@@ -6,19 +6,18 @@ namespace FoodDonationSystem.API.Extensions
     {
         public static WebApplication UseSwaggerDocumentation(this WebApplication app)
         {
-            if (app.Environment.IsDevelopment())
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Qoot API V1");
-                    c.RoutePrefix = "swagger";
-                    c.DefaultModelsExpandDepth(-1);
-                    c.DefaultModelExpandDepth(-1);
-                    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
-                    c.DisplayRequestDuration();
-                });
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Qoot API V1");
+                c.RoutePrefix = "swagger";
+                c.DefaultModelsExpandDepth(-1);
+                c.DefaultModelExpandDepth(-1);
+                c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+                c.DisplayRequestDuration();
+            });
+
 
             return app;
         }

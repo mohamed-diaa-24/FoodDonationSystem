@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /FoodDonationSystem.API/appsettings.json
+/FoodDonationSystem.API/.config/dotnet-tools.json
