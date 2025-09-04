@@ -3,7 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FoodDonationSystem.Core.DTOs.Restaurant
 {
-    public class CreateRestaurantDto
+    public class CreateRestaurantDto : CreateRestaurantRequest
+    {
+        public string? LicensePath { get; set; } = "";
+        public string? RegisterPath { get; set; } = "";
+
+    }
+
+    public class CreateRestaurantRequest
     {
         [Required(ErrorMessage = "اسم المطعم مطلوب")]
         public string Name { get; set; } = string.Empty;
@@ -27,10 +34,5 @@ namespace FoodDonationSystem.Core.DTOs.Restaurant
 
         [Required(ErrorMessage = "السجل التجاري مطلوب")]
         public IFormFile CommercialRegister { get; set; } = default!;
-
-
-        public string? LicensePath { get; set; } = "";
-        public string? RegisterPath { get; set; } = "";
-
     }
 }

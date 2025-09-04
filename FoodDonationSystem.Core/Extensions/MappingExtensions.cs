@@ -46,6 +46,20 @@ namespace FoodDonationSystem.Core.Extensions
             };
         }
 
+
+        public static CreateRestaurantDto ToCreateRestaurantDto(this CreateRestaurantRequest request)
+        {
+            return new CreateRestaurantDto
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Address = request.Address,
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
+                LicenseDocument = request.LicenseDocument,
+                CommercialRegister = request.CommercialRegister,
+            };
+        }
         public static IEnumerable<RestaurantDto> ToDto(this IEnumerable<Restaurant> restaurants)
         {
             return restaurants.Select(r => r.ToDto());
@@ -76,6 +90,7 @@ namespace FoodDonationSystem.Core.Extensions
             restaurant.UpdatedAt = DateTime.UtcNow;
             return restaurant;
         }
+
 
         public static PagedResult<RestaurantDto> ToRestaurantPagedResult(
            this (IEnumerable<Restaurant> Items, int TotalCount) source,

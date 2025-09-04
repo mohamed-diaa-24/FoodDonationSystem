@@ -1,6 +1,7 @@
 ﻿using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.DTOs.Restaurant;
 using FoodDonationSystem.Core.Enums;
+using FoodDonationSystem.Core.Extensions;
 using FoodDonationSystem.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,7 @@ namespace FoodDonationSystem.API.Controllers
 
         [HttpPost("register")]
         [Authorize(Roles = "Restaurant")]
-        public async Task<IActionResult> RegisterRestaurant([FromForm] CreateRestaurantDto request, [FromServices] IFileService fileService)
+        public async Task<IActionResult> RegisterRestaurant([FromForm] CreateRestaurantRequest restaurantRequest, [FromServices] IFileService fileService)
         {
 
             if (!ModelState.IsValid)
@@ -44,6 +45,7 @@ namespace FoodDonationSystem.API.Controllers
                 });
             }
 
+            CreateRestaurantDto request = restaurantRequest.ToCreateRestaurantDto();
             var files = new List<FileUploadItem>
             {
                 new FileUploadItem { File = request.LicenseDocument, Folder = "Licenses" },
