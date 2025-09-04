@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FoodDonationSystem.Core.Attributes;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace FoodDonationSystem.Core.DTOs.Restaurant
@@ -30,9 +31,11 @@ namespace FoodDonationSystem.Core.DTOs.Restaurant
         public double Longitude { get; set; }
 
         [Required(ErrorMessage = "ملف الترخيص مطلوب")]
+        [AllowedExtensions([".pdf"])]
         public IFormFile LicenseDocument { get; set; } = default!;
 
         [Required(ErrorMessage = "السجل التجاري مطلوب")]
+        [AllowedExtensions([".pdf"])]
         public IFormFile CommercialRegister { get; set; } = default!;
     }
 }
