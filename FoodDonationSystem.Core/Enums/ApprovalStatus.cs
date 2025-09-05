@@ -5,13 +5,13 @@ namespace FoodDonationSystem.Core.Enums
     public enum ApprovalStatus
     {
 
-        [Description("Pending")]
+        [Description("في انتظار الموافقة")]
         Pending = 1,
 
-        [Description("Approved")]
+        [Description("موافق عليه")]
         Approved = 2,
 
-        [Description("Rejected")]
+        [Description("مرفوض")]
         Rejected = 3
 
     }

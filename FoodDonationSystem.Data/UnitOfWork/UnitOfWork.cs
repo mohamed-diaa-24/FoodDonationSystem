@@ -14,7 +14,7 @@ namespace FoodDonationSystem.Data.UnitOfWork
 
 
         private IRestaurantRepository? _restaurants;
-
+        private ICharityRepository? _charities;
 
 
         public UnitOfWork(ApplicationDbContext context)
@@ -24,7 +24,8 @@ namespace FoodDonationSystem.Data.UnitOfWork
 
 
         public IRestaurantRepository Restaurants => _restaurants ??= new RestaurantRepository(_context);
-
+        public ICharityRepository Charities =>
+            _charities ??= new CharityRepository(_context);
 
         public async Task<int> SaveChangesAsync()
         {
