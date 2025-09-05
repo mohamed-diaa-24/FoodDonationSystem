@@ -113,15 +113,15 @@ namespace FoodDonationSystem.API.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            ApiResponse<IEnumerable<CharityDto>> result;
+            ApiResponse<PagedResult<CharityDto>> result;
             if (latitude > 0 && longitude > 0)
             {
-                result = await _charityService.GetNearbyCharitiesAsync(latitude, longitude, radiusKm);
+                result = await _charityService.GetNearbyCharitiesAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
             }
             else
             {
-                //logic
-                result = await _charityService.GetNearbyCharitiesAsync(latitude, longitude, radiusKm);
+                //logic 
+                result = await _charityService.GetNearbyCharitiesAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
             }
 
             if (result.IsSuccess)
@@ -169,9 +169,9 @@ namespace FoodDonationSystem.API.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] ApprovalStatus? status = null,
-            [FromQuery] CharityType? type = null)
+            [FromQuery] string? searchTerm = null)
         {
-            var result = await _charityService.GetCharitiesForAdminAsync(pageNumber, pageSize, status, type);
+            var result = await _charityService.GetCharitiesForAdminAsync(pageNumber, pageSize, status, searchTerm);
 
             if (result.IsSuccess)
                 return Ok(result);

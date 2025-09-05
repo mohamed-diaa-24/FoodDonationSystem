@@ -96,8 +96,8 @@ namespace FoodDonationSystem.API.Seed
                 new ApplicationUser
                 {
                     Id = Guid.NewGuid(),
-                    UserName = "admin@fooddonation.com",
-                    Email = "admin@fooddonation.com",
+                    UserName = "admin2@fooddonation.com",
+                    Email = "admin2@fooddonation.com",
                     FirstName = "أحمد",
                     LastName = "ضياء",
                     IsVerified = true,

@@ -88,18 +88,21 @@ namespace FoodDonationSystem.Core.Services
             }
         }
 
-        public async Task<ApiResponse<IEnumerable<CharityDto>>> GetNearbyCharitiesAsync(double latitude, double longitude, double radiusKm)
+        public async Task<ApiResponse<PagedResult<CharityDto>>> GetNearbyCharitiesAsync(
+           double latitude, double longitude, double radiusKm, int pageNumber = 1, int pageSize = 10)
         {
             try
             {
                 var charities = await _unitOfWork.Charities.GetNearbyCharitiesAsync(latitude, longitude, radiusKm);
-                var charityDtos = charities.ToDto();
 
-                return ApiResponse<IEnumerable<CharityDto>>.Success(charityDtos);
+                // Use extension method for manual pagination
+                var result = charities.ToManualPagedResult(pageNumber, pageSize, c => c.ToDto());
+
+                return ApiResponse<PagedResult<CharityDto>>.Success(result);
             }
             catch (Exception ex)
             {
-                return ApiResponse<IEnumerable<CharityDto>>.Failure($"Error retrieving nearby charities: {ex.Message}");
+                return ApiResponse<PagedResult<CharityDto>>.Failure($"حدث خطأ أثناء استرداد الجمعيات الخيرية القريبة: {ex.Message}");
             }
         }
 
@@ -138,12 +141,12 @@ namespace FoodDonationSystem.Core.Services
         }
 
         public async Task<ApiResponse<PagedResult<CharityDto>>> GetCharitiesForAdminAsync(
-            int pageNumber, int pageSize, ApprovalStatus? status = null, CharityType? type = null)
+            int pageNumber, int pageSize, ApprovalStatus? status = null, string? searchTerm = null)
         {
             try
             {
                 var charitiesResult = await _unitOfWork.Charities.GetCharitiesForAdminAsync(
-                    pageNumber, pageSize, status, type);
+                    pageNumber, pageSize, status, searchTerm);
 
                 // Use extension method for mapping
                 var result = charitiesResult.ToCharityPagedResult(pageNumber, pageSize);
@@ -152,7 +155,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<PagedResult<CharityDto>>.Failure($"Error retrieving charities: {ex.Message}");
+                return ApiResponse<PagedResult<CharityDto>>.Failure($"خطأ في استرداد الجمعيات الخيرية: {ex.Message}");
             }
         }
 

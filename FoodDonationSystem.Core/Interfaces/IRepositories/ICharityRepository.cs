@@ -11,6 +11,6 @@ namespace FoodDonationSystem.Core.Interfaces.IRepositories
         Task<IEnumerable<Charity>> GetCharitiesByTypeAsync(CharityType type);
         Task<bool> UpdateStatusAsync(int charityId, ApprovalStatus status, string? rejectionReason = null);
         Task<(IEnumerable<Charity> Charities, int TotalCount)> GetCharitiesForAdminAsync(
-            int pageNumber, int pageSize, ApprovalStatus? status = null, CharityType? type = null);
+            int pageNumber, int pageSize, ApprovalStatus? status = null, string? searchTerm = null);
     }
 }

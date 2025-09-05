@@ -65,15 +65,21 @@ namespace FoodDonationSystem.Data.Repositories
         }
 
         public async Task<(IEnumerable<Charity> Charities, int TotalCount)> GetCharitiesForAdminAsync(
-            int pageNumber, int pageSize, ApprovalStatus? status = null, CharityType? type = null)
+            int pageNumber, int pageSize, ApprovalStatus? status = null, string? searchTerm = null)
         {
             var query = _dbSet.Include(c => c.User).AsQueryable();
 
             if (status.HasValue)
                 query = query.Where(c => c.Status == status.Value);
 
-            if (type.HasValue)
-                query = query.Where(c => c.Type == type.Value);
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(c =>
+                    c.Name.Contains(searchTerm) ||
+                    c.User.FirstName.Contains(searchTerm) ||
+                    c.User.LastName.Contains(searchTerm) ||
+                    c.User.Email.Contains(searchTerm));
+            }
 
             var totalCount = await query.CountAsync();
 
