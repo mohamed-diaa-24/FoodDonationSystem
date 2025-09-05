@@ -4,6 +4,7 @@ namespace FoodDonationSystem.API.Controllers
 {
     [Route("api/open-app")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class OpenAppController : ControllerBase
     {
         private readonly IConfiguration _configuration;
