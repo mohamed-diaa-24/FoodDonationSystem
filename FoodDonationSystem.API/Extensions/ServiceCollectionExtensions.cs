@@ -1,4 +1,5 @@
 ﻿using FoodDonationSystem.API.Services;
+using FoodDonationSystem.Core;
 using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Interfaces;
@@ -197,10 +198,18 @@ namespace FoodDonationSystem.API.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRestaurantService, RestaurantService>();
             services.AddScoped<IFileService, FileService>();
+            return services;
+        }
+        public static IServiceCollection AddEmailService(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<EmailSettings>(
+            configuration.GetSection("EmailSettings"));
+
+            // تسجيل الخدمة
+            services.AddScoped<IEmailService, EmailService>();
 
             return services;
         }
-
 
         public static IServiceCollection AddApiControllers(this IServiceCollection services)
         {
@@ -251,6 +260,7 @@ namespace FoodDonationSystem.API.Extensions
                     .AddIdentityServices()
                     .AddJwtAuthentication(configuration)
                     .AddRepositoryServices()
+                    .AddEmailService(configuration)
                     .AddSwaggerDocumentation()
                     .AddCorsPolicy()
                     .AddApplicationServices();

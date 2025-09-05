@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -18,17 +19,19 @@ namespace FoodDonationSystem.Core.Services
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
-
+        private readonly IEmailService _emailService;
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
@@ -139,7 +142,61 @@ namespace FoodDonationSystem.Core.Services
             }
         }
 
+        public async Task<ApiResponse<string>> ForgetPasswordAsync(ForgetPasswordRequestDto request)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user == null)
+                {
+                    // لا نريد إفشاء أن المستخدم غير موجود لأسباب أمنية
+                    return ApiResponse<string>.Success("إذا كان البريد الإلكتروني موجود، سيتم إرسال رابط إعادة تعيين كلمة المرور");
+                }
 
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                // ترميز الرمز ليكون آمن في الـ URL
+                var encodedToken = WebUtility.UrlEncode(token);
+                var resetUrl = $"{_configuration["AppSettings:ClientUrl"]}/reset-password?email={request.Email}&token={encodedToken}";
+
+                // إرسال البريد الإلكتروني
+                await _emailService.SendPasswordResetEmailAsync(user.Email, user.FirstName, resetUrl);
+
+                return ApiResponse<string>.Success("إذا كان البريد الإلكتروني موجود، سيتم إرسال رابط إعادة تعيين كلمة المرور");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<string>> ResetPasswordAsync(ResetPasswordRequestDto request)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user == null)
+                {
+                    return ApiResponse<string>.Failure("المستخدم غير موجود");
+                }
+
+                // فك ترميز الرمز
+                var decodedToken = WebUtility.UrlDecode(request.Token);
+
+                var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.NewPassword);
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    return ApiResponse<string>.Failure($"فشل في إعادة تعيين كلمة المرور: {errors}");
+                }
+
+                return ApiResponse<string>.Success("تم إعادة تعيين كلمة المرور بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+            }
+        }
         public string GenerateJwtToken(Guid userId, string email, List<string> roles)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
@@ -175,11 +232,144 @@ namespace FoodDonationSystem.Core.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        public async Task<ApiResponse<string>> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto request)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return ApiResponse<string>.Failure("المستخدم غير موجود");
+                }
 
+                var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    return ApiResponse<string>.Failure($"فشل في تغيير كلمة المرور: {errors}");
+                }
+
+                return ApiResponse<string>.Success("تم تغيير كلمة المرور بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<string>> SendEmailConfirmationAsync(string email)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return ApiResponse<string>.Failure("المستخدم غير موجود");
+                }
+
+                if (user.EmailConfirmed)
+                {
+                    return ApiResponse<string>.Success("البريد الإلكتروني مؤكد بالفعل");
+                }
+
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var encodedToken = WebUtility.UrlEncode(token);
+                var confirmationUrl = $"{_configuration["AppSettings:ClientUrl"]}/confirm-email?email={email}&token={encodedToken}";
+
+                await _emailService.SendEmailConfirmationAsync(user.Email, user.FirstName, confirmationUrl);
+
+                return ApiResponse<string>.Success("تم إرسال رابط تأكيد البريد الإلكتروني");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<string>> ConfirmEmailAsync(string email, string token)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return ApiResponse<string>.Failure("المستخدم غير موجود");
+                }
+
+                if (user.EmailConfirmed)
+                {
+                    return ApiResponse<string>.Success("البريد الإلكتروني مؤكد بالفعل");
+                }
+
+                var decodedToken = WebUtility.UrlDecode(token);
+                var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    return ApiResponse<string>.Failure($"فشل في تأكيد البريد الإلكتروني: {errors}");
+                }
+
+                // تحديث حالة التحقق
+                user.IsVerified = true;
+                await _userManager.UpdateAsync(user);
+
+                return ApiResponse<string>.Success("تم تأكيد البريد الإلكتروني بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+            }
+        }
         public async Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string token)
         {
-            // TODO: Implement refresh token logic
-            throw new NotImplementedException();
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
+
+                // التحقق من الرمز المميز
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = _configuration["JwtSettings:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = _configuration["JwtSettings:Audience"],
+                    ValidateLifetime = false, // لا نتحقق من انتهاء الصلاحية هنا
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                {
+                    return ApiResponse<AuthResponseDto>.Failure("رمز غير صالح");
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null || !user.IsActive)
+                {
+                    return ApiResponse<AuthResponseDto>.Failure("المستخدم غير موجود أو غير نشط");
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+                var newToken = GenerateJwtToken(user.Id, user.Email, roles.ToList());
+
+                var data = new AuthResponseDto
+                {
+                    Token = newToken,
+                    TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryDays"])),
+                    User = user.ToDto(roles.ToList())
+                };
+
+                return ApiResponse<AuthResponseDto>.Success(data);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<AuthResponseDto>.Failure($"فشل في تحديث الرمز المميز: {ex.Message}");
+            }
         }
 
         public async Task<bool> LogoutAsync(string userId)
