@@ -103,7 +103,7 @@ namespace FoodDonationSystem.Core.Services
             <p>We received a request to reset your password. If you made this request, click the button below to reset your password:</p>
             
             
-            <a href='qoot://reset-password?token={resetToken}&email={Uri.EscapeDataString(toEmail)}' class='button'>
+            <a href='{resetToken}&email={Uri.EscapeDataString(toEmail)}' class='button'>
                 Reset Password
             </a>
             

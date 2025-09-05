@@ -20,6 +20,7 @@ namespace FoodDonationSystem.Core.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly string _baseUrl;
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
@@ -32,6 +33,7 @@ namespace FoodDonationSystem.Core.Services
             _signInManager = signInManager;
             _configuration = configuration;
             _emailService = emailService;
+            _baseUrl = configuration["AppSettings:BaseUrl"];
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
@@ -157,10 +159,10 @@ namespace FoodDonationSystem.Core.Services
 
                 // ترميز الرمز ليكون آمن في الـ URL
                 var encodedToken = WebUtility.UrlEncode(token);
-                var resetUrl = $"{_configuration["AppSettings:ClientUrl"]}/reset-password?email={request.Email}&token={encodedToken}";
+                var resetUrl = $"{_baseUrl}/api/open-app?email={request.Email}&token={encodedToken}";
 
                 // إرسال البريد الإلكتروني
-                await _emailService.SendPasswordResetEmailAsync(user.Email, user.FirstName, resetUrl);
+                await _emailService.SendPasswordResetEmailAsync(user.Email, resetUrl, user.FirstName);
 
                 return ApiResponse<string>.Success("إذا كان البريد الإلكتروني موجود، سيتم إرسال رابط إعادة تعيين كلمة المرور");
             }
