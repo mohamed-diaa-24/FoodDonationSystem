@@ -140,10 +140,10 @@ namespace FoodDonationSystem.API.Extensions
             try
             {
                 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-
+                var enviroment = app.Services.GetRequiredService<IWebHostEnvironment>();
 
                 // Seed all other data
-                await DataSeeder.SeedAllData(app.Services, logger);
+                await DataSeeder.SeedAllData(app.Services, logger, enviroment);
 
                 // Seed roles and admin user first
                 //await DataSeeder.SeedRoles(app.Services, logger);

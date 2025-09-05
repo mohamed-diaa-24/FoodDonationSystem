@@ -11,7 +11,7 @@ namespace FoodDonationSystem.API.Seed
 
 
 
-        public static async Task SeedAllData(IServiceProvider serviceProvider, ILogger logger)
+        public static async Task SeedAllData(IServiceProvider serviceProvider, ILogger logger, IWebHostEnvironment environment)
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -22,18 +22,25 @@ namespace FoodDonationSystem.API.Seed
 
             // Seed in order to respect foreign key constraints
             await SeedRoles(RoleManager, logger, context);
-            await SeedUsers(userManager, logger, context);
-            await SeedRestaurants(context, logger, context);
-            await SeedCharities(context, logger, context);
-            await SeedVolunteers(context, logger, context);
-            await SeedVolunteerAreas(context, logger, context);
-            await SeedRestaurantSchedules(context, logger, context);
-            await SeedDonations(context, logger, context);
-            await SeedDonationImages(context, logger, context);
-            await SeedCharityNeeds(context, logger, context);
-            await SeedReservations(context, logger, context);
-            await SeedDeliveries(context, logger, context);
-            await SeedReviews(context, logger, context);
+
+            if (environment.IsDevelopment())
+            {
+                await SeedUsers(userManager, logger, context);
+                await RoleSeeder.SeedAdminUser(userManager, logger);
+
+                await SeedRestaurants(context, logger, context);
+                await SeedCharities(context, logger, context);
+                await SeedVolunteers(context, logger, context);
+                await SeedVolunteerAreas(context, logger, context);
+                await SeedRestaurantSchedules(context, logger, context);
+                await SeedDonations(context, logger, context);
+                await SeedDonationImages(context, logger, context);
+                await SeedCharityNeeds(context, logger, context);
+                await SeedReservations(context, logger, context);
+                await SeedDeliveries(context, logger, context);
+                await SeedReviews(context, logger, context);
+            }
+            await RoleSeeder.SeedAdminUser(userManager, logger);
 
             await context.SaveChangesAsync();
             logger.LogInformation("All seeding data completed successfully!");
