@@ -140,9 +140,14 @@ namespace FoodDonationSystem.API.Extensions
             try
             {
                 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-                await DataSeeder.SeedRoles(app.Services, logger);
 
-                logger.LogInformation("Data seeding completed successfully");
+
+                // Seed all other data
+                await DataSeeder.SeedAllData(app.Services, logger);
+
+                // Seed roles and admin user first
+                //await DataSeeder.SeedRoles(app.Services, logger);
+                logger.LogInformation("All data seeding completed successfully");
             }
             catch (Exception ex)
             {

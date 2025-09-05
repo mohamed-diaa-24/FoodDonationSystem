@@ -117,7 +117,19 @@ namespace FoodDonationSystem.API.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            var result = await _restaurantService.GetNearbyRestaurantsAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
+            ApiResponse<PagedResult<RestaurantDto>> result;
+            if (latitude > 0 && longitude > 0)
+            {
+                result = await _restaurantService.GetNearbyRestaurantsAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
+            }
+            else
+            {
+
+                //logic 
+                result = await _restaurantService.GetNearbyRestaurantsAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
+            }
+
+
 
             if (result.IsSuccess)
                 return Ok(result);
