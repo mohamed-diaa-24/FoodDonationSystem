@@ -181,7 +181,7 @@ namespace FoodDonationSystem.API.Extensions
 
                 options.AddPolicy("Production", policy =>
                 {
-                    policy.WithOrigins("https://Myfrontend.com")
+                    policy.WithOrigins()
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .AllowCredentials();
