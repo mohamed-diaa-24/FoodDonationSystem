@@ -23,7 +23,7 @@ namespace FoodDonationSystem.Core.Services
                 var existingCharity = await _unitOfWork.Charities.GetByUserIdAsync(userId);
                 if (existingCharity != null)
                 {
-                    return ApiResponse<CharityDto>.Failure("User already has a charity registered");
+                    return ApiResponse<CharityDto>.Failure("المستخدم لديه جمعية خيرية مسجلة بالفعل");
                 }
 
                 // Create new charity using extension method
@@ -36,11 +36,11 @@ namespace FoodDonationSystem.Core.Services
                 var createdCharity = await _unitOfWork.Charities.GetByUserIdAsync(userId);
                 var charityDto = createdCharity!.ToDto();
 
-                return ApiResponse<CharityDto>.Success(charityDto, "Charity registered successfully. Awaiting admin approval.");
+                return ApiResponse<CharityDto>.Success(charityDto, "تم تسجيل الجمعية الخيرية بنجاح. بانتظار موافقة الإدارة.");
             }
             catch (Exception ex)
             {
-                return ApiResponse<CharityDto>.Failure($"Error registering charity: {ex.Message}");
+                return ApiResponse<CharityDto>.Failure($"خطأ في تسجيل الجمعية الخيرية: {ex.Message}");
             }
         }
 
@@ -51,15 +51,15 @@ namespace FoodDonationSystem.Core.Services
                 var charity = await _unitOfWork.Charities.GetByUserIdAsync(userId);
                 if (charity == null)
                 {
-                    return ApiResponse<CharityDto>.Failure("Charity not found");
+                    return ApiResponse<CharityDto>.Failure("لم يتم العثور على الجمعية الخيرية");
                 }
 
                 var charityDto = charity.ToDto();
-                return ApiResponse<CharityDto>.Success(charityDto);
+                return ApiResponse<CharityDto>.Success(charityDto, "تم استرداد بيانات الجمعية الخيرية بنجاح");
             }
             catch (Exception ex)
             {
-                return ApiResponse<CharityDto>.Failure($"Error retrieving charity: {ex.Message}");
+                return ApiResponse<CharityDto>.Failure($"خطأ في استرداد الجمعية الخيرية: {ex.Message}");
             }
         }
 
@@ -70,7 +70,7 @@ namespace FoodDonationSystem.Core.Services
                 var charity = await _unitOfWork.Charities.GetByUserIdAsync(userId);
                 if (charity == null)
                 {
-                    return ApiResponse<CharityDto>.Failure("Charity not found");
+                    return ApiResponse<CharityDto>.Failure("لم يتم العثور على الجمعية الخيرية");
                 }
 
                 // Update charity using extension method
@@ -80,11 +80,11 @@ namespace FoodDonationSystem.Core.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 var charityDto = charity.ToDto();
-                return ApiResponse<CharityDto>.Success(charityDto, "Charity updated successfully");
+                return ApiResponse<CharityDto>.Success(charityDto, "تم تحديث الجمعية الخيرية بنجاح");
             }
             catch (Exception ex)
             {
-                return ApiResponse<CharityDto>.Failure($"Error updating charity: {ex.Message}");
+                return ApiResponse<CharityDto>.Failure($"حدث خطأ أثناء تحديث الجمعية الخيرية: {ex.Message}");
             }
         }
 
@@ -98,7 +98,7 @@ namespace FoodDonationSystem.Core.Services
                 // Use extension method for manual pagination
                 var result = charities.ToManualPagedResult(pageNumber, pageSize, c => c.ToDto());
 
-                return ApiResponse<PagedResult<CharityDto>>.Success(result);
+                return ApiResponse<PagedResult<CharityDto>>.Success(result, "تم استرداد الجمعيات الخيرية القريبة بنجاح");
             }
             catch (Exception ex)
             {
@@ -113,11 +113,11 @@ namespace FoodDonationSystem.Core.Services
                 var charities = await _unitOfWork.Charities.GetCharitiesByTypeAsync(type);
                 var charityDtos = charities.ToDto();
 
-                return ApiResponse<IEnumerable<CharityDto>>.Success(charityDtos);
+                return ApiResponse<IEnumerable<CharityDto>>.Success(charityDtos, "تم استرداد الجمعيات الخيرية حسب النوع بنجاح");
             }
             catch (Exception ex)
             {
-                return ApiResponse<IEnumerable<CharityDto>>.Failure($"Error retrieving charities by type: {ex.Message}");
+                return ApiResponse<IEnumerable<CharityDto>>.Failure($"حدث خطأ أثناء استرداد الجمعيات الخيرية حسب النوع: {ex.Message}");
             }
         }
 
@@ -128,15 +128,15 @@ namespace FoodDonationSystem.Core.Services
                 var result = await _unitOfWork.Charities.UpdateStatusAsync(charityId, status, rejectionReason);
                 if (!result)
                 {
-                    return ApiResponse<bool>.Failure("Charity not found");
+                    return ApiResponse<bool>.Failure("لم يتم العثور على الجمعية الخيرية");
                 }
 
                 await _unitOfWork.SaveChangesAsync();
-                return ApiResponse<bool>.Success(true, "Charity status updated successfully");
+                return ApiResponse<bool>.Success(true, "تم تحديث حالة الجمعية الخيرية بنجاح");
             }
             catch (Exception ex)
             {
-                return ApiResponse<bool>.Failure($"Error updating charity status: {ex.Message}");
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء تحديث حالة الجمعية الخيرية: {ex.Message}");
             }
         }
 
@@ -151,7 +151,7 @@ namespace FoodDonationSystem.Core.Services
                 // Use extension method for mapping
                 var result = charitiesResult.ToCharityPagedResult(pageNumber, pageSize);
 
-                return ApiResponse<PagedResult<CharityDto>>.Success(result);
+                return ApiResponse<PagedResult<CharityDto>>.Success(result, "تم استرداد قائمة الجمعيات الخيرية بنجاح");
             }
             catch (Exception ex)
             {

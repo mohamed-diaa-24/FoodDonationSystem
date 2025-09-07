@@ -7,30 +7,30 @@ namespace FoodDonationSystem.Core.DTOs.Charity
 {
     public class CreateCharityRequest
     {
-        [Required(ErrorMessage = "Charity name is required")]
-        [StringLength(100, ErrorMessage = "Charity name cannot exceed 100 characters")]
+        [Required(ErrorMessage = "اسم الجمعية الخيرية مطلوب")]
+        [StringLength(100, ErrorMessage = "اسم الجمعية الخيرية لا يجب أن يزيد عن 100 حرف")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
+        [StringLength(500, ErrorMessage = "الوصف لا يجب أن يزيد عن 500 حرف")]
         public string Description { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Address is required")]
-        [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters")]
+        [Required(ErrorMessage = "العنوان مطلوب")]
+        [StringLength(200, ErrorMessage = "العنوان لا يجب أن يزيد عن 200 حرف")]
         public string Address { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Latitude is required")]
-        [Range(-90, 90, ErrorMessage = "Latitude must be between -90 and 90")]
+        [Required(ErrorMessage = "خط العرض مطلوب")]
+        [Range(-90, 90, ErrorMessage = "خط العرض يجب أن يكون بين -90 و 90")]
         public double Latitude { get; set; }
 
-        [Required(ErrorMessage = "Longitude is required")]
-        [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180")]
+        [Required(ErrorMessage = "خط الطول مطلوب")]
+        [Range(-180, 180, ErrorMessage = "خط الطول يجب أن يكون بين -180 و 180")]
         public double Longitude { get; set; }
 
-        [Required(ErrorMessage = "Capacity is required")]
-        [Range(1, 10000, ErrorMessage = "Capacity must be between 1 and 10000")]
+        [Required(ErrorMessage = "السعة مطلوبة")]
+        [Range(1, 10000, ErrorMessage = "السعة يجب أن تكون بين 1 و 10000")]
         public int Capacity { get; set; }
 
-        [Required(ErrorMessage = "Charity type is required")]
+        [Required(ErrorMessage = "نوع الجمعية الخيرية مطلوب")]
         public CharityType Type { get; set; }
         [Required(ErrorMessage = "ملف الترخيص مطلوب")]
         [AllowedExtensions([".pdf"])]

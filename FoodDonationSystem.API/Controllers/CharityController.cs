@@ -24,84 +24,120 @@ namespace FoodDonationSystem.API.Controllers
         private Guid GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Guid.Parse(userIdClaim!);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                throw new UnauthorizedAccessException("غير مصرح لك بالوصول");
+            }
+            return Guid.Parse(userIdClaim);
         }
 
         [HttpPost("register")]
         [Authorize(Roles = "Charity")]
         public async Task<IActionResult> RegisterCharity([FromForm] CreateCharityRequest charityRequest, [FromServices] IFileService fileService)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                var errorList = ModelState
-                    .Where(ms => ms.Value.Errors.Count > 0)
-                    .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
-                    .ToList();
-                return BadRequest(new ApiResponse<CreateCharityDto>
+                if (!ModelState.IsValid)
                 {
-                    Errors = errorList
+                    var errorList = ModelState
+                        .Where(ms => ms.Value.Errors.Count > 0)
+                        .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+                        .ToList();
+                    return BadRequest(new ApiResponse<CreateCharityDto>
+                    {
+                        Errors = errorList,
+                        Message = "برجاء ملئ البيانات بشكل صحيح"
+                    });
+                }
+
+                CreateCharityDto request = charityRequest.ToCreateCharityDto();
+                var files = new List<FileUploadItem>
+                {
+                    new FileUploadItem { File = request.LicenseDocument, Folder = "CharityLicenses" },
+                    new FileUploadItem { File = request.ProofDocument, Folder = "CharityProofs" }
+                }.Where(f => f.File != null).ToList();
+
+                var savedFiles = await fileService.SaveFilesWithRollbackAsync(files);
+                request.LicensePath = savedFiles.ElementAtOrDefault(0);
+                request.ProofPath = savedFiles.ElementAtOrDefault(1);
+
+                var userId = GetCurrentUserId();
+                var result = await _charityService.RegisterCharityAsync(userId, request);
+
+                if (!result.IsSuccess)
+                {
+                    fileService.DeleteFiles(savedFiles);
+                    return BadRequest(result);
+                }
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<CreateCharityDto>
+                {
+                    Message = "غير مصرح لك بالوصول"
                 });
             }
-
-            CreateCharityDto request = charityRequest.ToCreateCharityDto();
-            var files = new List<FileUploadItem>
-            {
-                new FileUploadItem { File = request.LicenseDocument, Folder = "CharityLicenses" },
-                new FileUploadItem { File = request.ProofDocument, Folder = "CharityProofs" }
-            }.Where(f => f.File != null).ToList();
-
-            var savedFiles = await fileService.SaveFilesWithRollbackAsync(files);
-            request.LicensePath = savedFiles.ElementAtOrDefault(0);
-            request.ProofPath = savedFiles.ElementAtOrDefault(1);
-
-            var userId = GetCurrentUserId();
-            var result = await _charityService.RegisterCharityAsync(userId, request);
-
-            if (!result.IsSuccess)
-            {
-                fileService.DeleteFiles(savedFiles);
-                return BadRequest(result);
-            }
-
-            return Ok(result);
         }
 
         [HttpGet("my-charity")]
         [Authorize(Roles = "Charity")]
         public async Task<IActionResult> GetMyCharity()
         {
-            var userId = GetCurrentUserId();
-            var result = await _charityService.GetCharityByUserIdAsync(userId);
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _charityService.GetCharityByUserIdAsync(userId);
 
-            if (result.IsSuccess)
-                return Ok(result);
+                if (result.IsSuccess)
+                    return Ok(result);
 
-            return NotFound(result);
+                return NotFound(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<CharityDto>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
+            }
         }
 
         [HttpPut("my-charity")]
         [Authorize(Roles = "Charity")]
         public async Task<IActionResult> UpdateMyCharity([FromBody] UpdateCharityDto request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                var errorList = ModelState
-                    .Where(ms => ms.Value.Errors.Count > 0)
-                    .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
-                    .ToList();
-                return BadRequest(new ApiResponse<UpdateCharityDto>
+                if (!ModelState.IsValid)
                 {
-                    Errors = errorList
+                    var errorList = ModelState
+                        .Where(ms => ms.Value.Errors.Count > 0)
+                        .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+                        .ToList();
+                    return BadRequest(new ApiResponse<UpdateCharityDto>
+                    {
+                        Errors = errorList,
+                        Message = "برجاء ملئ البيانات بشكل صحيح"
+                    });
+                }
+
+                var userId = GetCurrentUserId();
+                var result = await _charityService.UpdateCharityAsync(userId, request);
+
+                if (result.IsSuccess)
+                    return Ok(result);
+
+                return BadRequest(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<CharityDto>
+                {
+                    Message = "غير مصرح لك بالوصول"
                 });
             }
-
-            var userId = GetCurrentUserId();
-            var result = await _charityService.UpdateCharityAsync(userId, request);
-
-            if (result.IsSuccess)
-                return Ok(result);
-
-            return BadRequest(result);
         }
 
         [HttpGet("nearby")]
@@ -159,7 +195,7 @@ namespace FoodDonationSystem.API.Controllers
             {
                 IsSuccess = true,
                 Data = charityTypes,
-                Message = "Charity types retrieved successfully"
+                Message = "تم استرداد أنواع الجمعيات الخيرية بنجاح"
             });
         }
 
@@ -193,7 +229,8 @@ namespace FoodDonationSystem.API.Controllers
                     .ToList();
                 return BadRequest(new ApiResponse<UpdateStatusDto>
                 {
-                    Errors = errorList
+                    Errors = errorList,
+                    Message = "برجاء ملئ البيانات بشكل صحيح"
                 });
             }
 
