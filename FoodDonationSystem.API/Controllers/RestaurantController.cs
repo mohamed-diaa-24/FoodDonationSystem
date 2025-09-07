@@ -36,82 +36,111 @@ namespace FoodDonationSystem.API.Controllers
         [Authorize(Roles = "Restaurant")]
         public async Task<IActionResult> RegisterRestaurant([FromForm] CreateRestaurantRequest restaurantRequest, [FromServices] IFileService fileService)
         {
-
-            if (!ModelState.IsValid)
+            try
             {
-                var errorList = ModelState
-                  .Where(ms => ms.Value.Errors.Count > 0)
-                  .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
-                  .ToList();
-                return BadRequest(new ApiResponse<CreateRestaurantDto>
+                if (!ModelState.IsValid)
                 {
-                    Errors = errorList,
-                    Message = "برجاء ملئ البيانات بشكل صحيح"
+                    var errorList = ModelState
+                      .Where(ms => ms.Value.Errors.Count > 0)
+                      .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+                      .ToList();
+                    return BadRequest(new ApiResponse<CreateRestaurantDto>
+                    {
+                        Errors = errorList,
+                        Message = "برجاء ملئ البيانات بشكل صحيح"
+                    });
+                }
+
+                CreateRestaurantDto request = restaurantRequest.ToCreateRestaurantDto();
+                var files = new List<FileUploadItem>
+                {
+                    new FileUploadItem { File = request.LicenseDocument, Folder = "Licenses" },
+                    new FileUploadItem { File = request.CommercialRegister, Folder = "Registers" }
+                }.Where(f => f.File != null).ToList();
+
+                var savedFiles = await fileService.SaveFilesWithRollbackAsync(files);
+                request.LicensePath = savedFiles.ElementAtOrDefault(0);
+                request.RegisterPath = savedFiles.ElementAtOrDefault(1);
+
+                var userId = GetCurrentUserId();
+                var result = await _restaurantService.RegisterRestaurantAsync(userId, request);
+
+                if (!result.IsSuccess)
+                {
+
+                    fileService.DeleteFiles(savedFiles);
+                    return BadRequest(result);
+                }
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<CreateRestaurantDto>
+                {
+                    Message = "غير مصرح لك بالوصول"
                 });
             }
-
-            CreateRestaurantDto request = restaurantRequest.ToCreateRestaurantDto();
-            var files = new List<FileUploadItem>
-            {
-                new FileUploadItem { File = request.LicenseDocument, Folder = "Licenses" },
-                new FileUploadItem { File = request.CommercialRegister, Folder = "Registers" }
-            }.Where(f => f.File != null).ToList();
-
-            var savedFiles = await fileService.SaveFilesWithRollbackAsync(files);
-            request.LicensePath = savedFiles.ElementAtOrDefault(0);
-            request.RegisterPath = savedFiles.ElementAtOrDefault(1);
-
-            var userId = GetCurrentUserId();
-            var result = await _restaurantService.RegisterRestaurantAsync(userId, request);
-
-            if (!result.IsSuccess)
-            {
-
-                fileService.DeleteFiles(savedFiles);
-                return BadRequest(result);
-            }
-
-            return Ok(result);
         }
 
         [HttpGet("my-restaurant")]
         [Authorize(Roles = "Restaurant")]
         public async Task<IActionResult> GetMyRestaurant()
         {
-            var userId = GetCurrentUserId();
-            var result = await _restaurantService.GetRestaurantByUserIdAsync(userId);
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _restaurantService.GetRestaurantByUserIdAsync(userId);
 
-            if (result.IsSuccess)
-                return Ok(result);
+                if (result.IsSuccess)
+                    return Ok(result);
 
-            return NotFound(result);
+                return NotFound(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<RestaurantDto>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
+            }
         }
 
         [HttpPut("my-restaurant")]
         [Authorize(Roles = "Restaurant")]
         public async Task<IActionResult> UpdateMyRestaurant([FromBody] UpdateRestaurantDto request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                var errorList = ModelState
-                  .Where(ms => ms.Value.Errors.Count > 0)
-                  .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
-                  .ToList();
-                return BadRequest(new ApiResponse<CreateRestaurantDto>
+                if (!ModelState.IsValid)
                 {
-                    Errors = errorList,
-                    Message = "برجاء ملئ البيانات بشكل صحيح"
-                });
+                    var errorList = ModelState
+                      .Where(ms => ms.Value.Errors.Count > 0)
+                      .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+                      .ToList();
+                    return BadRequest(new ApiResponse<CreateRestaurantDto>
+                    {
+                        Errors = errorList,
+                        Message = "برجاء ملئ البيانات بشكل صحيح"
+                    });
 
+                }
+
+                var userId = GetCurrentUserId();
+                var result = await _restaurantService.UpdateRestaurantAsync(userId, request);
+
+                if (result.IsSuccess)
+                    return Ok(result);
+
+                return BadRequest(result);
             }
-
-            var userId = GetCurrentUserId();
-            var result = await _restaurantService.UpdateRestaurantAsync(userId, request);
-
-            if (result.IsSuccess)
-                return Ok(result);
-
-            return BadRequest(result);
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<RestaurantDto>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
+            }
         }
 
         [HttpGet("nearby")]
