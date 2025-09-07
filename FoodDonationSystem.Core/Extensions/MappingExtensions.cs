@@ -1,4 +1,5 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
+using FoodDonationSystem.Core.DTOs.Charity;
 using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.DTOs.Restaurant;
 using FoodDonationSystem.Core.Entities;
@@ -160,6 +161,87 @@ namespace FoodDonationSystem.Core.Extensions
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+        #endregion
+
+
+        #region CharityMapping
+        public static CharityDto ToDto(this Charity charity)
+        {
+            return new CharityDto
+            {
+                Id = charity.Id,
+                Name = charity.Name,
+                Description = charity.Description,
+                Address = charity.Address,
+                Latitude = charity.Latitude,
+                Longitude = charity.Longitude,
+                Capacity = charity.Capacity,
+                Type = charity.Type,
+                Status = charity.Status,
+                IsActive = charity.IsActive,
+                CreatedAt = charity.CreatedAt,
+                ContactName = charity.User != null ? $"{charity.User.FirstName} {charity.User.LastName}" : "",
+                Email = charity.User?.Email ?? "",
+                PhoneNumber = charity.User?.PhoneNumber ?? ""
+            };
+        }
+
+        public static IEnumerable<CharityDto> ToDto(this IEnumerable<Charity> charities)
+        {
+            return charities.Select(c => c.ToDto());
+        }
+
+        public static CreateCharityDto ToCreateCharityDto(this CreateCharityRequest request)
+        {
+            return new CreateCharityDto
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Address = request.Address,
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
+                LicenseDocument = request.LicenseDocument,
+                ProofDocument = request.ProofDocument,
+                Capacity = request.Capacity,
+            };
+        }
+        public static Charity ToEntity(this CreateCharityDto dto, Guid userId)
+        {
+            return new Charity
+            {
+                UserId = userId,
+                Name = dto.Name,
+                Description = dto.Description,
+                Address = dto.Address,
+                Latitude = dto.Latitude,
+                Longitude = dto.Longitude,
+                Capacity = dto.Capacity,
+                Type = dto.Type,
+                Status = ApprovalStatus.Pending,
+                IsActive = true,
+            };
+        }
+        public static Charity UpdateFromDto(this Charity charity, UpdateCharityDto dto)
+        {
+            charity.Name = dto.Name;
+            charity.Description = dto.Description;
+            charity.Address = dto.Address;
+            charity.Latitude = dto.Latitude;
+            charity.Longitude = dto.Longitude;
+            charity.Capacity = dto.Capacity;
+            charity.Type = dto.Type;
+            charity.UpdatedAt = DateTime.UtcNow;
+
+            return charity;
+        }
+
+        public static PagedResult<CharityDto> ToCharityPagedResult(
+           this (IEnumerable<Charity> Items, int TotalCount) source,
+           int pageNumber,
+           int pageSize)
+        {
+            return source.ToPagedResult(pageNumber, pageSize, c => c.ToDto());
         }
         #endregion
 
