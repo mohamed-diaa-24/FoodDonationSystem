@@ -57,7 +57,7 @@ namespace FoodDonationSystem.Core.Services
                 }
 
                 var restaurantDto = restaurant.ToDto();
-                return ApiResponse<RestaurantDto>.Success(restaurantDto);
+                return ApiResponse<RestaurantDto>.Success(restaurantDto, "تم استرداد بيانات المطعم بنجاح");
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace FoodDonationSystem.Core.Services
                 // Use extension method for manual pagination
                 var result = restaurants.ToManualPagedResult(pageNumber, pageSize, r => r.ToDto());
 
-                return ApiResponse<PagedResult<RestaurantDto>>.Success(result);
+                return ApiResponse<PagedResult<RestaurantDto>>.Success(result, "تم استرداد المطاعم القريبة بنجاح");
             }
             catch (Exception ex)
             {
@@ -115,7 +115,7 @@ namespace FoodDonationSystem.Core.Services
                 var restaurants = await _unitOfWork.Restaurants.GetRestaurantsWithActiveDonationsAsync();
                 var restaurantDtos = restaurants.ToDto();
 
-                return ApiResponse<IEnumerable<RestaurantDto>>.Success(restaurantDtos);
+                return ApiResponse<IEnumerable<RestaurantDto>>.Success(restaurantDtos, "تم استرداد المطاعم التي تحتوي على تبرعات بنجاح");
             }
             catch (Exception ex)
             {
@@ -158,7 +158,7 @@ namespace FoodDonationSystem.Core.Services
                 // Use extension method for mapping
                 var result = restaurantsResult.ToRestaurantPagedResult(pageNumber, pageSize);
 
-                return ApiResponse<PagedResult<RestaurantDto>>.Success(result);
+                return ApiResponse<PagedResult<RestaurantDto>>.Success(result, "تم استرداد قائمة المطاعم بنجاح");
             }
             catch (Exception ex)
             {

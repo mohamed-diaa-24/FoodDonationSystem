@@ -25,7 +25,11 @@ namespace FoodDonationSystem.API.Controllers
         private Guid GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Guid.Parse(userIdClaim!);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                throw new UnauthorizedAccessException("غير مصرح لك بالوصول");
+            }
+            return Guid.Parse(userIdClaim);
         }
 
         [HttpPost("register")]
@@ -41,7 +45,8 @@ namespace FoodDonationSystem.API.Controllers
                   .ToList();
                 return BadRequest(new ApiResponse<CreateRestaurantDto>
                 {
-                    Errors = errorList
+                    Errors = errorList,
+                    Message = "برجاء ملئ البيانات بشكل صحيح"
                 });
             }
 
@@ -94,7 +99,8 @@ namespace FoodDonationSystem.API.Controllers
                   .ToList();
                 return BadRequest(new ApiResponse<CreateRestaurantDto>
                 {
-                    Errors = errorList
+                    Errors = errorList,
+                    Message = "برجاء ملئ البيانات بشكل صحيح"
                 });
 
             }
@@ -179,7 +185,8 @@ namespace FoodDonationSystem.API.Controllers
                   .ToList();
                 return BadRequest(new ApiResponse<CreateRestaurantDto>
                 {
-                    Errors = errorList
+                    Errors = errorList,
+                    Message = "برجاء ملئ البيانات بشكل صحيح"
                 });
 
             }

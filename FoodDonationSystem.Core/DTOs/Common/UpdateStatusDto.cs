@@ -5,7 +5,7 @@ namespace FoodDonationSystem.Core.DTOs.Common
 {
     public class UpdateStatusDto
     {
-        [Required]
+        [Required(ErrorMessage = "حالة الموافقة مطلوبة")]
         public ApprovalStatus Status { get; set; }
 
         public string? RejectionReason { get; set; }
