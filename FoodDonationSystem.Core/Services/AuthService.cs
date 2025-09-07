@@ -20,7 +20,7 @@ namespace FoodDonationSystem.Core.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
-        private readonly string _baseUrl;
+        private readonly string _baseUrl = string.Empty;
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
@@ -33,7 +33,7 @@ namespace FoodDonationSystem.Core.Services
             _signInManager = signInManager;
             _configuration = configuration;
             _emailService = emailService;
-            _baseUrl = configuration["AppSettings:BaseUrl"];
+            _baseUrl = configuration["AppSettings:BaseUrl"] ?? string.Empty;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
@@ -51,7 +51,7 @@ namespace FoodDonationSystem.Core.Services
                 if (request.Role.ToLower() == "Admin".ToLower() || !await _roleManager.RoleExistsAsync(request.Role))
                 {
 
-                    return ApiResponse<AuthResponseDto>.Failure("دور المستخدم غير صالح");
+                    return ApiResponse<AuthResponseDto>.Failure("دور المستخدم غير صالح أو غير مسموح");
                 }
 
 
@@ -89,12 +89,12 @@ namespace FoodDonationSystem.Core.Services
                     TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryDays"])),
                     User = user.ToDto(roles.ToList())
                 };
-                return ApiResponse<AuthResponseDto>.Success(data);
+                return ApiResponse<AuthResponseDto>.Success(data, "تم إنشاء الحساب بنجاح");
 
             }
             catch (Exception ex)
             {
-                return ApiResponse<AuthResponseDto>.Failure($"حدث خطأ أثناء إنشاء الحساب.: {ex.Message}");
+                return ApiResponse<AuthResponseDto>.Failure($"حدث خطأ أثناء إنشاء الحساب: {ex.Message}");
             }
         }
 
@@ -106,7 +106,7 @@ namespace FoodDonationSystem.Core.Services
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null)
                 {
-                    return ApiResponse<AuthResponseDto>.Failure("لبريد الإلكتروني أو كلمة المرور غير صحيحة");
+                    return ApiResponse<AuthResponseDto>.Failure("البريد الإلكتروني أو كلمة المرور غير صحيحة");
                 }
 
 
@@ -136,7 +136,7 @@ namespace FoodDonationSystem.Core.Services
                     TokenExpiry = DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:ExpiryDays"])),
                     User = user.ToDto(roles.ToList())
                 };
-                return ApiResponse<AuthResponseDto>.Success(data);
+                return ApiResponse<AuthResponseDto>.Success(data, "تم تسجيل الدخول بنجاح");
             }
             catch (Exception ex)
             {
@@ -164,11 +164,11 @@ namespace FoodDonationSystem.Core.Services
                 // إرسال البريد الإلكتروني
                 await _emailService.SendPasswordResetEmailAsync(user.Email, resetUrl, user.FirstName);
 
-                return ApiResponse<string>.Success("إذا كان البريد الإلكتروني موجود، سيتم إرسال رابط إعادة تعيين كلمة المرور");
+                return ApiResponse<string>.Success("إذا كان البريد الإلكتروني موجود، سيتم إرسال رابط إعادة تعيين كلمة المرور", "تم إرسال رابط إعادة تعيين كلمة المرور");
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+                return ApiResponse<string>.Failure($"حدث خطأ أثناء إرسال رابط إعادة تعيين كلمة المرور: {ex.Message}");
             }
         }
 
@@ -196,7 +196,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+                return ApiResponse<string>.Failure($"حدث خطأ أثناء إعادة تعيين كلمة المرور: {ex.Message}");
             }
         }
         public string GenerateJwtToken(Guid userId, string email, List<string> roles)
@@ -255,7 +255,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+                return ApiResponse<string>.Failure($"حدث خطأ أثناء تغيير كلمة المرور: {ex.Message}");
             }
         }
         public async Task<ApiResponse<string>> SendEmailConfirmationAsync(string email)
@@ -283,7 +283,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+                return ApiResponse<string>.Failure($"حدث خطأ أثناء إرسال رابط تأكيد البريد الإلكتروني: {ex.Message}");
             }
         }
 
@@ -319,7 +319,7 @@ namespace FoodDonationSystem.Core.Services
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.Failure($"حدث خطأ: {ex.Message}");
+                return ApiResponse<string>.Failure($"حدث خطأ أثناء تأكيد البريد الإلكتروني: {ex.Message}");
             }
         }
         public async Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string token)
@@ -338,7 +338,7 @@ namespace FoodDonationSystem.Core.Services
                     ValidIssuer = _configuration["JwtSettings:Issuer"],
                     ValidateAudience = true,
                     ValidAudience = _configuration["JwtSettings:Audience"],
-                    ValidateLifetime = false, // لا نتحقق من انتهاء الصلاحية هنا
+                    ValidateLifetime = false,
                     ClockSkew = TimeSpan.Zero
                 };
 
@@ -366,7 +366,7 @@ namespace FoodDonationSystem.Core.Services
                     User = user.ToDto(roles.ToList())
                 };
 
-                return ApiResponse<AuthResponseDto>.Success(data);
+                return ApiResponse<AuthResponseDto>.Success(data, "تم تحديث الرمز المميز بنجاح");
             }
             catch (Exception ex)
             {

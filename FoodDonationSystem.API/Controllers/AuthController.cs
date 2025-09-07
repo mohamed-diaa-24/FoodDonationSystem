@@ -76,7 +76,15 @@ namespace FoodDonationSystem.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errorList = ModelState
+                  .Where(ms => ms.Value.Errors.Count > 0)
+                  .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+                  .ToList();
+                return BadRequest(new ApiResponse<string>
+                {
+                    Errors = errorList,
+                    Message = "برجاء ملئ البيانات بشكل صحيح"
+                });
             }
 
             var result = await _authService.ForgetPasswordAsync(request);
@@ -94,7 +102,15 @@ namespace FoodDonationSystem.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errorList = ModelState
+                  .Where(ms => ms.Value.Errors.Count > 0)
+                  .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+                  .ToList();
+                return BadRequest(new ApiResponse<string>
+                {
+                    Errors = errorList,
+                    Message = "برجاء ملئ البيانات بشكل صحيح"
+                });
             }
 
             var result = await _authService.ResetPasswordAsync(request);
@@ -113,13 +129,24 @@ namespace FoodDonationSystem.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errorList = ModelState
+                  .Where(ms => ms.Value.Errors.Count > 0)
+                  .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+                  .ToList();
+                return BadRequest(new ApiResponse<string>
+                {
+                    Errors = errorList,
+                    Message = "برجاء ملئ البيانات بشكل صحيح"
+                });
             }
 
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
-                return Unauthorized();
+                return Unauthorized(new ApiResponse<string>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
             }
 
             var result = await _authService.ChangePasswordAsync(Guid.Parse(userId), request);
@@ -137,7 +164,10 @@ namespace FoodDonationSystem.API.Controllers
         {
             if (string.IsNullOrEmpty(email))
             {
-                return BadRequest("Email is required");
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "البريد الإلكتروني مطلوب"
+                });
             }
 
             var result = await _authService.SendEmailConfirmationAsync(email);
@@ -155,7 +185,10 @@ namespace FoodDonationSystem.API.Controllers
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
             {
-                return BadRequest("Email and token are required");
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "البريد الإلكتروني والرمز مطلوبان"
+                });
             }
 
             var result = await _authService.ConfirmEmailAsync(email, token);
@@ -179,7 +212,11 @@ namespace FoodDonationSystem.API.Controllers
                 await _authService.LogoutAsync(userId);
             }
 
-            return Ok(new { message = "لقد قمت بتسجيل الخروج بنجاح" });
+            return Ok(new ApiResponse<string>
+            {
+                IsSuccess = true,
+                Message = "لقد قمت بتسجيل الخروج بنجاح"
+            });
         }
     }
 }

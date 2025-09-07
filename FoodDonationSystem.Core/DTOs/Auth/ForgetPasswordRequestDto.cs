@@ -4,39 +4,39 @@ namespace FoodDonationSystem.Core.DTOs.Auth
 {
     public class ForgetPasswordRequestDto
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
+        [EmailAddress(ErrorMessage = "البريد الإلكتروني غير صالح")]
         public string Email { get; set; } = string.Empty;
     }
 
     public class ResetPasswordRequestDto
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
+        [EmailAddress(ErrorMessage = "البريد الإلكتروني غير صالح")]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Reset token is required")]
+        [Required(ErrorMessage = "رمز إعادة التعيين مطلوب")]
         public string Token { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "New password is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 100 characters")]
+        [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "كلمة المرور يجب أن تكون بين 6 و 100 حرف")]
         public string NewPassword { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password confirmation is required")]
-        [Compare("NewPassword", ErrorMessage = "Password and confirmation do not match")]
+        [Required(ErrorMessage = "تأكيد كلمة المرور مطلوب")]
+        [Compare("NewPassword", ErrorMessage = "كلمة المرور والتأكيد غير متطابقين")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
     public class ChangePasswordRequestDto
     {
-        [Required(ErrorMessage = "Current password is required")]
+        [Required(ErrorMessage = "كلمة المرور الحالية مطلوبة")]
         public string CurrentPassword { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "New password is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 100 characters")]
+        [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "كلمة المرور يجب أن تكون بين 6 و 100 حرف")]
         public string NewPassword { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password confirmation is required")]
-        [Compare("NewPassword", ErrorMessage = "Password and confirmation do not match")]
+        [Required(ErrorMessage = "تأكيد كلمة المرور مطلوب")]
+        [Compare("NewPassword", ErrorMessage = "كلمة المرور والتأكيد غير متطابقين")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }
