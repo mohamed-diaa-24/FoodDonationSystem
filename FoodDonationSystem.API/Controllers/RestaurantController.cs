@@ -146,30 +146,40 @@ namespace FoodDonationSystem.API.Controllers
         [HttpGet("nearby")]
         [Authorize(Roles = "Charity,Admin")]
         public async Task<IActionResult> GetNearbyRestaurants(
-            [FromQuery] double latitude,
-            [FromQuery] double longitude,
+            [FromQuery] double? latitude,
+            [FromQuery] double? longitude,
             [FromQuery] double radiusKm = 10,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            ApiResponse<PagedResult<RestaurantDto>> result;
-            if (latitude > 0 && longitude > 0)
+            try
             {
-                result = await _restaurantService.GetNearbyRestaurantsAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
+                ApiResponse<PagedResult<RestaurantDto>> result;
+
+                if (latitude.HasValue && longitude.HasValue && latitude > 0 && longitude > 0)
+                {
+                    result = await _restaurantService.GetNearbyRestaurantsAsync(
+                        latitude.Value, longitude.Value, radiusKm, pageNumber, pageSize);
+                }
+                else
+                {
+                    var userId = GetCurrentUserId();
+                    result = await _restaurantService.GetNearbyRestaurantsForCharityAsync(
+                        userId, radiusKm, pageNumber, pageSize);
+                }
+
+                if (result.IsSuccess)
+                    return Ok(result);
+
+                return BadRequest(result);
             }
-            else
+            catch (UnauthorizedAccessException)
             {
-
-                //logic 
-                result = await _restaurantService.GetNearbyRestaurantsAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
+                return Unauthorized(new ApiResponse<PagedResult<RestaurantDto>>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
             }
-
-
-
-            if (result.IsSuccess)
-                return Ok(result);
-
-            return BadRequest(result);
         }
 
         [HttpGet("with-donations")]
