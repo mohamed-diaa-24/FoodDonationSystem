@@ -151,17 +151,16 @@ namespace FoodDonationSystem.Core.Services
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null)
                 {
-                    // لا نريد إفشاء أن المستخدم غير موجود لأسباب أمنية
                     return ApiResponse<string>.Success("إذا كان البريد الإلكتروني موجود، سيتم إرسال رابط إعادة تعيين كلمة المرور");
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                // ترميز الرمز ليكون آمن في الـ URL
-                var encodedToken = WebUtility.UrlEncode(token);
-                var resetUrl = $"{_baseUrl}/api/open-app?email={request.Email}&token={encodedToken}";
 
-                // إرسال البريد الإلكتروني
+                var encodedToken = WebUtility.UrlEncode(token);
+                var resetUrl = $"{_baseUrl}/api/open-app/reset-password?email={request.Email}&token={encodedToken}";
+
+
                 await _emailService.SendPasswordResetEmailAsync(user.Email, resetUrl, user.FirstName);
 
                 return ApiResponse<string>.Success("إذا كان البريد الإلكتروني موجود، سيتم إرسال رابط إعادة تعيين كلمة المرور", "تم إرسال رابط إعادة تعيين كلمة المرور");
@@ -275,9 +274,9 @@ namespace FoodDonationSystem.Core.Services
 
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var encodedToken = WebUtility.UrlEncode(token);
-                var confirmationUrl = $"{_configuration["AppSettings:ClientUrl"]}/confirm-email?email={email}&token={encodedToken}";
+                var confirmationUrl = $"{_baseUrl}/api/open-app/confirm-email?email={email}&token={encodedToken}";
 
-                await _emailService.SendEmailConfirmationAsync(user.Email, user.FirstName, confirmationUrl);
+                await _emailService.SendEmailConfirmationAsync(user.Email, confirmationUrl, user.FirstName);
 
                 return ApiResponse<string>.Success("تم إرسال رابط تأكيد البريد الإلكتروني");
             }
