@@ -143,27 +143,40 @@ namespace FoodDonationSystem.API.Controllers
         [HttpGet("nearby")]
         [Authorize(Roles = "Restaurant,Admin")]
         public async Task<IActionResult> GetNearbyCharities(
-            [FromQuery] double latitude,
-            [FromQuery] double longitude,
+            [FromQuery] double? latitude,
+            [FromQuery] double? longitude,
             [FromQuery] double radiusKm = 10,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            ApiResponse<PagedResult<CharityDto>> result;
-            if (latitude > 0 && longitude > 0)
+            try
             {
-                result = await _charityService.GetNearbyCharitiesAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
+                ApiResponse<PagedResult<CharityDto>> result;
+
+                if (latitude.HasValue && longitude.HasValue && latitude > 0 && longitude > 0)
+                {
+                    result = await _charityService.GetNearbyCharitiesAsync(
+                        latitude.Value, longitude.Value, radiusKm, pageNumber, pageSize);
+                }
+                else
+                {
+                    var userId = GetCurrentUserId();
+                    result = await _charityService.GetNearbyCharitiesForRestaurantAsync(
+                        userId, radiusKm, pageNumber, pageSize);
+                }
+
+                if (result.IsSuccess)
+                    return Ok(result);
+
+                return BadRequest(result);
             }
-            else
+            catch (UnauthorizedAccessException)
             {
-                //logic 
-                result = await _charityService.GetNearbyCharitiesAsync(latitude, longitude, radiusKm, pageNumber, pageSize);
+                return Unauthorized(new ApiResponse<PagedResult<CharityDto>>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
             }
-
-            if (result.IsSuccess)
-                return Ok(result);
-
-            return BadRequest(result);
         }
 
         [HttpGet("by-type/{type}")]

@@ -106,6 +106,30 @@ namespace FoodDonationSystem.Core.Services
             }
         }
 
+        public async Task<ApiResponse<PagedResult<CharityDto>>> GetNearbyCharitiesForRestaurantAsync(
+           Guid restaurantUserId, double radiusKm, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                var restaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(restaurantUserId);
+                if (restaurant == null)
+                {
+                    return ApiResponse<PagedResult<CharityDto>>.Failure("لم يتم العثور على المطعم");
+                }
+
+                var charities = await _unitOfWork.Charities.GetNearbyCharitiesAsync(
+                    restaurant.Latitude, restaurant.Longitude, radiusKm);
+
+                var result = charities.ToManualPagedResult(pageNumber, pageSize, c => c.ToDto());
+
+                return ApiResponse<PagedResult<CharityDto>>.Success(result, "تم استرداد الجمعيات الخيرية القريبة من المطعم بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PagedResult<CharityDto>>.Failure($"حدث خطأ أثناء استرداد الجمعيات الخيرية القريبة: {ex.Message}");
+            }
+        }
+
         public async Task<ApiResponse<IEnumerable<CharityDto>>> GetCharitiesByTypeAsync(CharityType type)
         {
             try
