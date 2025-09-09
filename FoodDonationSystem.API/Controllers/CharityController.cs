@@ -255,8 +255,36 @@ namespace FoodDonationSystem.API.Controllers
             return BadRequest(result);
         }
 
+        [HttpDelete("my-charity")]
+        [Authorize(Roles = "Charity")]
+        public async Task<IActionResult> DeleteMyCharity()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _charityService.DeleteMyCharityAsync(userId);
+                if (result.IsSuccess)
+                    return Ok(result);
+                return BadRequest(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<bool>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
+            }
+        }
 
-
+        [HttpDelete("admin/{charityId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminDeleteCharity(int charityId)
+        {
+            var result = await _charityService.AdminDeleteCharityAsync(charityId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
 
     }
 }

@@ -14,5 +14,7 @@ namespace FoodDonationSystem.Core.Interfaces.IServices
         Task<ApiResponse<IEnumerable<CharityDto>>> GetCharitiesByTypeAsync(CharityType type);
         Task<ApiResponse<bool>> UpdateStatusAsync(int charityId, ApprovalStatus status, string? rejectionReason = null);
         Task<ApiResponse<PagedResult<CharityDto>>> GetCharitiesForAdminAsync(int pageNumber, int pageSize, ApprovalStatus? status = null, string? searchTerm = null);
+        Task<ApiResponse<bool>> DeleteMyCharityAsync(Guid userId);
+        Task<ApiResponse<bool>> AdminDeleteCharityAsync(int charityId);
     }
 }

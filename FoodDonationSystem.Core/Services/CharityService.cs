@@ -1,8 +1,10 @@
 ﻿using FoodDonationSystem.Core.DTOs.Charity;
 using FoodDonationSystem.Core.DTOs.Common;
+using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Enums;
 using FoodDonationSystem.Core.Extensions;
 using FoodDonationSystem.Core.Interfaces;
+using FoodDonationSystem.Core.Interfaces.IRepositories;
 using FoodDonationSystem.Core.Interfaces.IServices;
 
 namespace FoodDonationSystem.Core.Services
@@ -10,10 +12,16 @@ namespace FoodDonationSystem.Core.Services
     public class CharityService : ICharityService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGenericRepository<Reservation> _reservationRepository;
+        private readonly IGenericRepository<CharityNeed> _charityNeedRepository;
 
-        public CharityService(IUnitOfWork unitOfWork)
+        public CharityService(IUnitOfWork unitOfWork,
+            IGenericRepository<Reservation> reservationRepository,
+            IGenericRepository<CharityNeed> charityNeedRepository)
         {
             _unitOfWork = unitOfWork;
+            _reservationRepository = reservationRepository;
+            _charityNeedRepository = charityNeedRepository;
         }
         public async Task<ApiResponse<CharityDto>> RegisterCharityAsync(Guid userId, CreateCharityDto request)
         {
@@ -180,6 +188,73 @@ namespace FoodDonationSystem.Core.Services
             catch (Exception ex)
             {
                 return ApiResponse<PagedResult<CharityDto>>.Failure($"خطأ في استرداد الجمعيات الخيرية: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<bool>> DeleteMyCharityAsync(Guid userId)
+        {
+            try
+            {
+                var charity = await _unitOfWork.Charities.GetByUserIdAsync(userId);
+                if (charity == null)
+                {
+                    return ApiResponse<bool>.Failure("لم يتم العثور على الجمعية الخيرية");
+                }
+
+                // Soft delete navigation children first (Reservations, Needs)
+                var reservations = await _reservationRepository.FindAsync(r => r.CharityId == charity.Id);
+                foreach (var reservation in reservations)
+                {
+                    await _reservationRepository.SoftDeleteAsync(reservation);
+                }
+
+                var needs = await _charityNeedRepository.FindAsync(n => n.CharityId == charity.Id);
+                foreach (var need in needs)
+                {
+                    await _charityNeedRepository.SoftDeleteAsync(need);
+                }
+
+                await _unitOfWork.Charities.SoftDeleteAsync(charity);
+                await _unitOfWork.SaveChangesAsync();
+
+                return ApiResponse<bool>.Success(true, "تم حذف الجمعية الخيرية بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء حذف الجمعية الخيرية: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<bool>> AdminDeleteCharityAsync(int charityId)
+        {
+            try
+            {
+                var charity = await _unitOfWork.Charities.GetByIdAsync(charityId);
+                if (charity == null)
+                {
+                    return ApiResponse<bool>.Failure("لم يتم العثور على الجمعية الخيرية");
+                }
+
+                var reservations = await _reservationRepository.FindAsync(r => r.CharityId == charity.Id);
+                foreach (var reservation in reservations)
+                {
+                    await _reservationRepository.SoftDeleteAsync(reservation);
+                }
+
+                var needs = await _charityNeedRepository.FindAsync(n => n.CharityId == charity.Id);
+                foreach (var need in needs)
+                {
+                    await _charityNeedRepository.SoftDeleteAsync(need);
+                }
+
+                await _unitOfWork.Charities.SoftDeleteAsync(charity);
+                await _unitOfWork.SaveChangesAsync();
+
+                return ApiResponse<bool>.Success(true, "تم حذف الجمعية الخيرية بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء حذف الجمعية الخيرية: {ex.Message}");
             }
         }
 
