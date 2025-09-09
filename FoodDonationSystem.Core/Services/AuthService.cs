@@ -2,6 +2,7 @@
 using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Extensions;
+using FoodDonationSystem.Core.Interfaces;
 using FoodDonationSystem.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -21,12 +22,14 @@ namespace FoodDonationSystem.Core.Services
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
         private readonly string _baseUrl = string.Empty;
+        private readonly IUnitOfWork _unitOfWork;
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration,
-            IEmailService emailService)
+            IEmailService emailService,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -34,6 +37,7 @@ namespace FoodDonationSystem.Core.Services
             _configuration = configuration;
             _emailService = emailService;
             _baseUrl = configuration["AppSettings:BaseUrl"] ?? string.Empty;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
@@ -395,6 +399,21 @@ namespace FoodDonationSystem.Core.Services
                 user.IsDeleted = true;
                 await _userManager.UpdateAsync(user);
 
+                // Soft delete navigation roots (Restaurant/Charity) if exist
+                var restaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(user.Id);
+                if (restaurant != null)
+                {
+                    await _unitOfWork.Restaurants.SoftDeleteAsync(restaurant);
+                }
+
+                var charity = await _unitOfWork.Charities.GetByUserIdAsync(user.Id);
+                if (charity != null)
+                {
+                    await _unitOfWork.Charities.SoftDeleteAsync(charity);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+
                 return ApiResponse<bool>.Success(true, "تم حذف الحساب بنجاح");
             }
             catch (Exception ex)
@@ -416,6 +435,20 @@ namespace FoodDonationSystem.Core.Services
                 user.IsActive = false;
                 user.IsDeleted = true;
                 await _userManager.UpdateAsync(user);
+
+                var restaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(user.Id);
+                if (restaurant != null)
+                {
+                    await _unitOfWork.Restaurants.SoftDeleteAsync(restaurant);
+                }
+
+                var charity = await _unitOfWork.Charities.GetByUserIdAsync(user.Id);
+                if (charity != null)
+                {
+                    await _unitOfWork.Charities.SoftDeleteAsync(charity);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return ApiResponse<bool>.Success(true, "تم حذف المستخدم بنجاح");
             }
