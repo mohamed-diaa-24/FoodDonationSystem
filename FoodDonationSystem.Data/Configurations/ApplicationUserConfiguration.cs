@@ -20,7 +20,7 @@ namespace FoodDonationSystem.Data.Configurations
                    .HasMaxLength(500);
 
             // Query Filter for Soft Delete
-            builder.HasQueryFilter(e => !e.IsDeleted);
+            //builder.HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }
