@@ -3,6 +3,7 @@ using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Extensions;
 using FoodDonationSystem.Core.Interfaces;
+using FoodDonationSystem.Core.Interfaces.IRepositories;
 using FoodDonationSystem.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -23,13 +24,19 @@ namespace FoodDonationSystem.Core.Services
         private readonly IEmailService _emailService;
         private readonly string _baseUrl = string.Empty;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGenericRepository<Volunteer> _volunteerRepository;
+        private readonly IGenericRepository<VolunteerArea> _volunteerAreaRepository;
+        private readonly IGenericRepository<Review> _reviewRepository;
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration,
             IEmailService emailService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IGenericRepository<Volunteer> volunteerRepository,
+            IGenericRepository<VolunteerArea> volunteerAreaRepository,
+            IGenericRepository<Review> reviewRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -38,6 +45,9 @@ namespace FoodDonationSystem.Core.Services
             _emailService = emailService;
             _baseUrl = configuration["AppSettings:BaseUrl"] ?? string.Empty;
             _unitOfWork = unitOfWork;
+            _volunteerRepository = volunteerRepository;
+            _volunteerAreaRepository = volunteerAreaRepository;
+            _reviewRepository = reviewRepository;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
@@ -412,6 +422,25 @@ namespace FoodDonationSystem.Core.Services
                     await _unitOfWork.Charities.SoftDeleteAsync(charity);
                 }
 
+                // Volunteer: soft delete volunteer and its service areas
+                var volunteer = await _volunteerRepository.FindFirstAsync(v => v.UserId == user.Id);
+                if (volunteer != null)
+                {
+                    var areas = await _volunteerAreaRepository.FindAsync(a => a.VolunteerId == volunteer.Id);
+                    foreach (var area in areas)
+                    {
+                        await _volunteerAreaRepository.SoftDeleteAsync(area);
+                    }
+                    await _volunteerRepository.SoftDeleteAsync(volunteer);
+                }
+
+                // Reviews: soft delete given and received reviews
+                var relatedReviews = await _reviewRepository.FindAsync(r => r.FromUserId == user.Id || r.ToUserId == user.Id);
+                foreach (var review in relatedReviews)
+                {
+                    await _reviewRepository.SoftDeleteAsync(review);
+                }
+
                 await _unitOfWork.SaveChangesAsync();
 
                 return ApiResponse<bool>.Success(true, "تم حذف الحساب بنجاح");
@@ -446,6 +475,25 @@ namespace FoodDonationSystem.Core.Services
                 if (charity != null)
                 {
                     await _unitOfWork.Charities.SoftDeleteAsync(charity);
+                }
+
+                // Volunteer: soft delete volunteer and its service areas
+                var volunteer = await _volunteerRepository.FindFirstAsync(v => v.UserId == user.Id);
+                if (volunteer != null)
+                {
+                    var areas = await _volunteerAreaRepository.FindAsync(a => a.VolunteerId == volunteer.Id);
+                    foreach (var area in areas)
+                    {
+                        await _volunteerAreaRepository.SoftDeleteAsync(area);
+                    }
+                    await _volunteerRepository.SoftDeleteAsync(volunteer);
+                }
+
+                // Reviews: soft delete given and received reviews
+                var relatedReviews = await _reviewRepository.FindAsync(r => r.FromUserId == user.Id || r.ToUserId == user.Id);
+                foreach (var review in relatedReviews)
+                {
+                    await _reviewRepository.SoftDeleteAsync(review);
                 }
 
                 await _unitOfWork.SaveChangesAsync();
