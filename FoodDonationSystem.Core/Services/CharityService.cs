@@ -12,16 +12,9 @@ namespace FoodDonationSystem.Core.Services
     public class CharityService : ICharityService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<Reservation> _reservationRepository;
-        private readonly IGenericRepository<CharityNeed> _charityNeedRepository;
-
-        public CharityService(IUnitOfWork unitOfWork,
-            IGenericRepository<Reservation> reservationRepository,
-            IGenericRepository<CharityNeed> charityNeedRepository)
+        public CharityService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _reservationRepository = reservationRepository;
-            _charityNeedRepository = charityNeedRepository;
         }
         public async Task<ApiResponse<CharityDto>> RegisterCharityAsync(Guid userId, CreateCharityDto request)
         {
@@ -202,16 +195,16 @@ namespace FoodDonationSystem.Core.Services
                 }
 
                 // Soft delete navigation children first (Reservations, Needs)
-                var reservations = await _reservationRepository.FindAsync(r => r.CharityId == charity.Id);
+                var reservations = await _unitOfWork.Reservations.FindAsync(r => r.CharityId == charity.Id);
                 foreach (var reservation in reservations)
                 {
-                    await _reservationRepository.SoftDeleteAsync(reservation);
+                    await _unitOfWork.Reservations.SoftDeleteAsync(reservation);
                 }
 
-                var needs = await _charityNeedRepository.FindAsync(n => n.CharityId == charity.Id);
+                var needs = await _unitOfWork.CharityNeeds.FindAsync(n => n.CharityId == charity.Id);
                 foreach (var need in needs)
                 {
-                    await _charityNeedRepository.SoftDeleteAsync(need);
+                    await _unitOfWork.CharityNeeds.SoftDeleteAsync(need);
                 }
 
                 await _unitOfWork.Charities.SoftDeleteAsync(charity);
@@ -235,16 +228,16 @@ namespace FoodDonationSystem.Core.Services
                     return ApiResponse<bool>.Failure("لم يتم العثور على الجمعية الخيرية");
                 }
 
-                var reservations = await _reservationRepository.FindAsync(r => r.CharityId == charity.Id);
+                var reservations = await _unitOfWork.Reservations.FindAsync(r => r.CharityId == charity.Id);
                 foreach (var reservation in reservations)
                 {
-                    await _reservationRepository.SoftDeleteAsync(reservation);
+                    await _unitOfWork.Reservations.SoftDeleteAsync(reservation);
                 }
 
-                var needs = await _charityNeedRepository.FindAsync(n => n.CharityId == charity.Id);
+                var needs = await _unitOfWork.CharityNeeds.FindAsync(n => n.CharityId == charity.Id);
                 foreach (var need in needs)
                 {
-                    await _charityNeedRepository.SoftDeleteAsync(need);
+                    await _unitOfWork.CharityNeeds.SoftDeleteAsync(need);
                 }
 
                 await _unitOfWork.Charities.SoftDeleteAsync(charity);

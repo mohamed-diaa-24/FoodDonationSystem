@@ -4,6 +4,7 @@ using FoodDonationSystem.Core.Enums;
 using FoodDonationSystem.Core.Extensions;
 using FoodDonationSystem.Core.Interfaces;
 using FoodDonationSystem.Core.Interfaces.IServices;
+using FoodDonationSystem.Core.Interfaces.IRepositories;
 
 namespace FoodDonationSystem.Core.Services
 {
@@ -176,6 +177,32 @@ namespace FoodDonationSystem.Core.Services
                     return ApiResponse<bool>.Failure("لم يتم العثور على المطعم");
                 }
 
+                // Soft delete schedules
+                var schedules = await _unitOfWork.RestaurantSchedules.FindAsync(s => s.RestaurantId == restaurant.Id);
+                foreach (var schedule in schedules)
+                {
+                    await _unitOfWork.RestaurantSchedules.SoftDeleteAsync(schedule);
+                }
+
+                // Soft delete donations and nested images and reservations
+                var donations = await _unitOfWork.Donations.FindAsync(d => d.RestaurantId == restaurant.Id);
+                foreach (var donation in donations)
+                {
+                    var images = await _unitOfWork.DonationImages.FindAsync(i => i.DonationId == donation.Id);
+                    foreach (var image in images)
+                    {
+                        await _unitOfWork.DonationImages.SoftDeleteAsync(image);
+                    }
+
+                    var reservations = await _unitOfWork.Reservations.FindAsync(r => r.DonationId == donation.Id);
+                    foreach (var reservation in reservations)
+                    {
+                        await _unitOfWork.Reservations.SoftDeleteAsync(reservation);
+                    }
+
+                    await _unitOfWork.Donations.SoftDeleteAsync(donation);
+                }
+
                 await _unitOfWork.Restaurants.SoftDeleteAsync(restaurant);
                 await _unitOfWork.SaveChangesAsync();
 
@@ -195,6 +222,30 @@ namespace FoodDonationSystem.Core.Services
                 if (restaurant == null)
                 {
                     return ApiResponse<bool>.Failure("لم يتم العثور على المطعم");
+                }
+
+                var schedules = await _unitOfWork.RestaurantSchedules.FindAsync(s => s.RestaurantId == restaurant.Id);
+                foreach (var schedule in schedules)
+                {
+                    await _unitOfWork.RestaurantSchedules.SoftDeleteAsync(schedule);
+                }
+
+                var donations = await _unitOfWork.Donations.FindAsync(d => d.RestaurantId == restaurant.Id);
+                foreach (var donation in donations)
+                {
+                    var images = await _unitOfWork.DonationImages.FindAsync(i => i.DonationId == donation.Id);
+                    foreach (var image in images)
+                    {
+                        await _unitOfWork.DonationImages.SoftDeleteAsync(image);
+                    }
+
+                    var reservations = await _unitOfWork.Reservations.FindAsync(r => r.DonationId == donation.Id);
+                    foreach (var reservation in reservations)
+                    {
+                        await _unitOfWork.Reservations.SoftDeleteAsync(reservation);
+                    }
+
+                    await _unitOfWork.Donations.SoftDeleteAsync(donation);
                 }
 
                 await _unitOfWork.Restaurants.SoftDeleteAsync(restaurant);
