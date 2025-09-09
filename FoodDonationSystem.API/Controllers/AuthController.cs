@@ -218,5 +218,32 @@ namespace FoodDonationSystem.API.Controllers
                 Message = "لقد قمت بتسجيل الخروج بنجاح"
             });
         }
+
+        [HttpDelete("me")]
+        [Authorize]
+        public async Task<IActionResult> DeleteMyAccount()
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized(new ApiResponse<bool>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
+            }
+
+            var result = await _authService.DeleteMyAccountAsync(Guid.Parse(userId));
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpDelete("admin/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminDeleteUser(Guid userId)
+        {
+            var result = await _authService.AdminDeleteUserAsync(userId);
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result);
+        }
     }
 }

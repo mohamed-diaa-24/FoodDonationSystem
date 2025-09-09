@@ -379,5 +379,50 @@ namespace FoodDonationSystem.Core.Services
             await Task.CompletedTask;
             return true;
         }
+
+        public async Task<ApiResponse<bool>> DeleteMyAccountAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return ApiResponse<bool>.Failure("المستخدم غير موجود");
+                }
+
+                // Soft delete: mark as deleted/inactive
+                user.IsActive = false;
+                user.IsDeleted = true;
+                await _userManager.UpdateAsync(user);
+
+                return ApiResponse<bool>.Success(true, "تم حذف الحساب بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء حذف الحساب: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<bool>> AdminDeleteUserAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return ApiResponse<bool>.Failure("المستخدم غير موجود");
+                }
+
+                user.IsActive = false;
+                user.IsDeleted = true;
+                await _userManager.UpdateAsync(user);
+
+                return ApiResponse<bool>.Success(true, "تم حذف المستخدم بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء حذف المستخدم: {ex.Message}");
+            }
+        }
     }
 }

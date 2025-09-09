@@ -15,5 +15,7 @@ namespace FoodDonationSystem.Core.Interfaces.IServices
         Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string token);
         Task<bool> LogoutAsync(string userId);
         string GenerateJwtToken(Guid userId, string email, List<string> roles);
+        Task<ApiResponse<bool>> DeleteMyAccountAsync(Guid userId);
+        Task<ApiResponse<bool>> AdminDeleteUserAsync(Guid userId);
     }
 }
