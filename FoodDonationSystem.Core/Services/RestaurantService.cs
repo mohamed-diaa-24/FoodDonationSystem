@@ -166,6 +166,48 @@ namespace FoodDonationSystem.Core.Services
             }
         }
 
+        public async Task<ApiResponse<bool>> DeleteMyRestaurantAsync(Guid userId)
+        {
+            try
+            {
+                var restaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(userId);
+                if (restaurant == null)
+                {
+                    return ApiResponse<bool>.Failure("لم يتم العثور على المطعم");
+                }
+
+                await _unitOfWork.Restaurants.SoftDeleteAsync(restaurant);
+                await _unitOfWork.SaveChangesAsync();
+
+                return ApiResponse<bool>.Success(true, "تم حذف المطعم بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء حذف المطعم: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<bool>> AdminDeleteRestaurantAsync(int restaurantId)
+        {
+            try
+            {
+                var restaurant = await _unitOfWork.Restaurants.GetByIdAsync(restaurantId);
+                if (restaurant == null)
+                {
+                    return ApiResponse<bool>.Failure("لم يتم العثور على المطعم");
+                }
+
+                await _unitOfWork.Restaurants.SoftDeleteAsync(restaurant);
+                await _unitOfWork.SaveChangesAsync();
+
+                return ApiResponse<bool>.Success(true, "تم حذف المطعم بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Failure($"حدث خطأ أثناء حذف المطعم: {ex.Message}");
+            }
+        }
+
 
 
 

@@ -14,5 +14,7 @@ namespace FoodDonationSystem.Core.Interfaces.IServices
         Task<ApiResponse<IEnumerable<RestaurantDto>>> GetRestaurantsWithActiveDonationsAsync();
         Task<ApiResponse<bool>> UpdateStatusAsync(int restaurantId, ApprovalStatus status, string? rejectionReason = null);
         Task<ApiResponse<PagedResult<RestaurantDto>>> GetRestaurantsForAdminAsync(int pageNumber, int pageSize, ApprovalStatus? status = null, string? searchTerm = null);
+        Task<ApiResponse<bool>> DeleteMyRestaurantAsync(Guid userId);
+        Task<ApiResponse<bool>> AdminDeleteRestaurantAsync(int restaurantId);
     }
 }

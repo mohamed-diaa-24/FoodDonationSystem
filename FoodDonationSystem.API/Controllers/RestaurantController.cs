@@ -238,5 +238,36 @@ namespace FoodDonationSystem.API.Controllers
             return BadRequest(result);
         }
 
+        [HttpDelete("my-restaurant")]
+        [Authorize(Roles = "Restaurant")]
+        public async Task<IActionResult> DeleteMyRestaurant()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _restaurantService.DeleteMyRestaurantAsync(userId);
+                if (result.IsSuccess)
+                    return Ok(result);
+                return BadRequest(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new ApiResponse<bool>
+                {
+                    Message = "غير مصرح لك بالوصول"
+                });
+            }
+        }
+
+        [HttpDelete("admin/{restaurantId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminDeleteRestaurant(int restaurantId)
+        {
+            var result = await _restaurantService.AdminDeleteRestaurantAsync(restaurantId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }
