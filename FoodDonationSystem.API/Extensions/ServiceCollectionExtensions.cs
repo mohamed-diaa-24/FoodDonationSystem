@@ -199,6 +199,7 @@ namespace FoodDonationSystem.API.Extensions
             services.AddScoped<IRestaurantService, RestaurantService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<ICharityService, CharityService>();
+            services.AddScoped<IDonationService, DonationService>();
             return services;
         }
         public static IServiceCollection AddEmailService(this IServiceCollection services, IConfiguration configuration)

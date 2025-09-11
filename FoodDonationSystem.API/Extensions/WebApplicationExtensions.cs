@@ -18,7 +18,6 @@ namespace FoodDonationSystem.API.Extensions
                 c.DisplayRequestDuration();
             });
 
-
             return app;
         }
 

@@ -1,6 +1,7 @@
 ﻿using FoodDonationSystem.Core.DTOs.Auth;
 using FoodDonationSystem.Core.DTOs.Charity;
 using FoodDonationSystem.Core.DTOs.Common;
+using FoodDonationSystem.Core.DTOs.Donation;
 using FoodDonationSystem.Core.DTOs.Restaurant;
 using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Enums;
@@ -245,6 +246,108 @@ namespace FoodDonationSystem.Core.Extensions
         }
         #endregion
 
+        #region DonationMapping
+        public static DonationDto ToDto(this Donation donation)
+        {
+            return new DonationDto
+            {
+                Id = donation.Id,
+                FoodType = donation.FoodType,
+                Description = donation.Description,
+                EstimatedServings = donation.EstimatedServings,
+                ExpiryDateTime = donation.ExpiryDateTime,
+                Status = donation.Status,
+                RequiresPickup = donation.RequiresPickup,
+                SpecialInstructions = donation.SpecialInstructions,
+                ContactPerson = donation.ContactPerson,
+                ContactPhone = donation.ContactPhone,
+                CreatedAt = donation.CreatedAt,
+                UpdatedAt = donation.UpdatedAt ?? donation.CreatedAt,
+                RestaurantId = donation.RestaurantId,
+                RestaurantName = donation.Restaurant?.Name ?? "",
+                RestaurantAddress = donation.Restaurant?.Address ?? "",
+                RestaurantPhone = donation.Restaurant?.User?.PhoneNumber ?? "",
+                RestaurantLatitude = donation.Restaurant?.Latitude ?? 0,
+                RestaurantLongitude = donation.Restaurant?.Longitude ?? 0,
+                Images = donation.Images?.Select(i => i.ToDto()).ToList() ?? new List<DonationImageDto>(),
+                ReservationCount = donation.Reservations?.Count ?? 0
+            };
+        }
+
+        public static IEnumerable<DonationDto> ToDto(this IEnumerable<Donation> donations)
+        {
+            return donations.Select(d => d.ToDto());
+        }
+
+        public static Donation ToEntity(this CreateDonationDto dto, int restaurantId)
+        {
+            return new Donation
+            {
+                RestaurantId = restaurantId,
+                FoodType = dto.FoodType,
+                Description = dto.Description,
+                EstimatedServings = dto.EstimatedServings,
+                ExpiryDateTime = dto.ExpiryDateTime,
+                Status = DonationStatus.Available,
+                RequiresPickup = dto.RequiresPickup,
+                SpecialInstructions = dto.SpecialInstructions,
+                ContactPerson = dto.ContactPerson,
+                ContactPhone = dto.ContactPhone
+            };
+        }
+
+        public static Donation UpdateFromDto(this Donation donation, UpdateDonationDto dto)
+        {
+            donation.FoodType = dto.FoodType;
+            donation.Description = dto.Description;
+            donation.EstimatedServings = dto.EstimatedServings;
+            donation.ExpiryDateTime = dto.ExpiryDateTime;
+            donation.Status = dto.Status;
+            donation.RequiresPickup = dto.RequiresPickup;
+            donation.SpecialInstructions = dto.SpecialInstructions;
+            donation.ContactPerson = dto.ContactPerson;
+            donation.ContactPhone = dto.ContactPhone;
+            donation.UpdatedAt = DateTime.UtcNow;
+            return donation;
+        }
+
+        public static PagedResult<DonationDto> ToDonationPagedResult(
+           this (IEnumerable<Donation> Items, int TotalCount) source,
+           int pageNumber,
+           int pageSize)
+        {
+            return source.ToPagedResult(pageNumber, pageSize, d => d.ToDto());
+        }
+        #endregion
+
+        #region DonationImageMapping
+        public static DonationImageDto ToDto(this DonationImage image)
+        {
+            return new DonationImageDto
+            {
+                Id = image.Id,
+                ImagePath = image.ImagePath,
+                IsPrimary = image.IsPrimary,
+                DonationId = image.DonationId,
+                CreatedAt = image.CreatedAt
+            };
+        }
+
+        public static IEnumerable<DonationImageDto> ToDto(this IEnumerable<DonationImage> images)
+        {
+            return images.Select(i => i.ToDto());
+        }
+
+        public static DonationImage ToEntity(this CreateDonationImageDto dto)
+        {
+            return new DonationImage
+            {
+                DonationId = dto.DonationId,
+                ImagePath = dto.ImagePath,
+                IsPrimary = dto.IsPrimary
+            };
+        }
+        #endregion
 
         public static string ToDisplayName<T>(this T enumValue) where T : Enum
         {

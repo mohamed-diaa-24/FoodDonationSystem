@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FoodDonationSystem.Data.Configurations
 {
-    public class DonationImageConfiguration
+    public class DonationImageConfiguration : IEntityTypeConfiguration<DonationImage>
     {
         public void Configure(EntityTypeBuilder<DonationImage> builder)
         {
@@ -19,6 +19,9 @@ namespace FoodDonationSystem.Data.Configurations
                    .WithMany(d => d.Images)
                    .HasForeignKey(i => i.DonationId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            // Query Filter for Soft Delete
+            builder.HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }
