@@ -3,6 +3,7 @@ using FoodDonationSystem.Core.DTOs.Charity;
 using FoodDonationSystem.Core.DTOs.Common;
 using FoodDonationSystem.Core.DTOs.Donation;
 using FoodDonationSystem.Core.DTOs.Restaurant;
+using FoodDonationSystem.Core.DTOs.Reservation;
 using FoodDonationSystem.Core.Entities;
 using FoodDonationSystem.Core.Enums;
 
@@ -345,6 +346,50 @@ namespace FoodDonationSystem.Core.Extensions
                 DonationId = dto.DonationId,
                 ImagePath = dto.ImagePath,
                 IsPrimary = dto.IsPrimary
+            };
+        }
+        #endregion
+
+        #region ReservationMapping
+        public static ReservationDto ToDto(this Reservation reservation)
+        {
+            return new ReservationDto
+            {
+                Id = reservation.Id,
+                ReservationTime = reservation.ReservationTime,
+                Status = reservation.Status,
+                Notes = reservation.Notes,
+                PickupTime = reservation.PickupTime,
+                PickupPersonName = reservation.PickupPersonName,
+                PickupPersonPhone = reservation.PickupPersonPhone,
+                DonationId = reservation.DonationId,
+                CharityId = reservation.CharityId,
+                DonationFoodType = reservation.Donation?.FoodType ?? string.Empty,
+                DonationExpiry = reservation.Donation?.ExpiryDateTime ?? DateTime.MinValue,
+                RestaurantId = reservation.Donation?.RestaurantId ?? 0,
+                RestaurantName = reservation.Donation?.Restaurant?.Name ?? string.Empty,
+                RestaurantPhone = reservation.Donation?.Restaurant?.User?.PhoneNumber ?? string.Empty,
+                RestaurantAddress = reservation.Donation?.Restaurant?.Address ?? string.Empty,
+            };
+        }
+
+        public static IEnumerable<ReservationDto> ToDto(this IEnumerable<Reservation> reservations)
+        {
+            return reservations.Select(r => r.ToDto());
+        }
+
+        public static Reservation ToEntity(this CreateReservationDto dto, int charityId)
+        {
+            return new Reservation
+            {
+                DonationId = dto.DonationId,
+                CharityId = charityId,
+                ReservationTime = DateTime.UtcNow,
+                Status = ReservationStatus.Pending,
+                Notes = dto.Notes,
+                PickupTime = dto.PickupTime,
+                PickupPersonName = dto.PickupPersonName,
+                PickupPersonPhone = dto.PickupPersonPhone
             };
         }
         #endregion

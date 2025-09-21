@@ -10,7 +10,6 @@ namespace FoodDonationSystem.Core.Entities
         public DateTime? PickupTime { get; set; }
         public string? PickupPersonName { get; set; }
         public string? PickupPersonPhone { get; set; }
-        public int? VolunteerId { get; set; }
 
         // Navigation Properties
         public int DonationId { get; set; }
@@ -19,6 +18,5 @@ namespace FoodDonationSystem.Core.Entities
         public int CharityId { get; set; }
 
         public Charity Charity { get; set; } = null!;
-        public Delivery? Delivery { get; set; }
     }
 }

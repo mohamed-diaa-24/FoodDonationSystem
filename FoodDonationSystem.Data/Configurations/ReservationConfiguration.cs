@@ -30,10 +30,6 @@ namespace FoodDonationSystem.Data.Configurations
                    .HasForeignKey(r => r.CharityId)
                    .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasOne(r => r.Delivery)
-                   .WithOne(d => d.Reservation)
-                   .HasForeignKey<Delivery>(d => d.ReservationId)
-                   .OnDelete(DeleteBehavior.Cascade);
 
             // Query Filter for Soft Delete
             builder.HasQueryFilter(e => !e.IsDeleted);

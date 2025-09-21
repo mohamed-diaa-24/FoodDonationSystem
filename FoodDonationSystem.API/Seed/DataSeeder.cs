@@ -734,9 +734,9 @@ namespace FoodDonationSystem.API.Seed
             var charities = await context.Charities.ToListAsync();
             var volunteers = await context.Volunteers.ToListAsync();
 
-            if (donations.Count == 0 || charities.Count == 0 || volunteers.Count == 0)
+            if (donations.Count == 0 || charities.Count == 0)
             {
-                logger.LogError($"Missing required data for reservations. Donations: {donations.Count}, Charities: {charities.Count}, Volunteers: {volunteers.Count}. Skipping reservation seeding.");
+                logger.LogError($"Missing required data for reservations. Donations: {donations.Count}, Charities: {charities.Count}. Skipping reservation seeding.");
                 return;
             }
 
@@ -750,7 +750,6 @@ namespace FoodDonationSystem.API.Seed
                     PickupTime = DateTime.UtcNow.AddHours(2),
                     PickupPersonName = "سارة الجمعية",
                     PickupPersonPhone = "+201234567894",
-                    VolunteerId = volunteers[0].Id,
                     DonationId = donations[2].Id, // السمك المشوي المحجوز
                     CharityId = charities[0].Id
                 },

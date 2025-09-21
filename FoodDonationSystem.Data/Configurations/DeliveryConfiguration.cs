@@ -17,10 +17,7 @@ namespace FoodDonationSystem.Data.Configurations
                    .HasMaxLength(500);
 
             // Relationships
-            builder.HasOne(d => d.Reservation)
-                   .WithOne(r => r.Delivery)
-                   .HasForeignKey<Delivery>(d => d.ReservationId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            // Reservation relationship removed as deliveries are no longer tied to reservations
 
             builder.HasOne(d => d.Volunteer)
                    .WithMany(v => v.Deliveries)
