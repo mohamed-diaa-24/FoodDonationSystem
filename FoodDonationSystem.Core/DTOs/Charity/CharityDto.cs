@@ -1,4 +1,5 @@
 ﻿using FoodDonationSystem.Core.Enums;
+using FoodDonationSystem.Core.Extensions;
 
 namespace FoodDonationSystem.Core.DTOs.Charity
 {
@@ -13,6 +14,7 @@ namespace FoodDonationSystem.Core.DTOs.Charity
         public int Capacity { get; set; }
         public CharityType Type { get; set; }
         public ApprovalStatus Status { get; set; }
+        public string StatusDisplayName => Status.ToDisplayName();
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
 
