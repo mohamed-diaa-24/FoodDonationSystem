@@ -128,15 +128,14 @@ namespace FoodDonationSystem.Core.Services
 			if (charity == null)
 				return ApiResponse<PagedResult<ReservationDto>>.Failure("لم يتم العثور على الجمعية");
 
-			var (items, total) = await _unitOfWork.Reservations.GetPagedAsync(
-				pageNumber,
-				pageSize,
-				r => r.CharityId == charity.Id,
-				orderBy: r => r.CreatedAt,
-				orderByDescending: true);
+		var (items, total) = await _unitOfWork.Reservations.GetPagedWithDetailsAsync(
+			pageNumber,
+			pageSize,
+			r => r.CharityId == charity.Id,
+			orderBy: r => r.CreatedAt,
+			orderByDescending: true);
 
-			// Note: includes are not handled in generic repo; projection fields may be empty unless loaded elsewhere
-			var dto = (items, total).ToPagedResult(pageNumber, pageSize, r => r.ToDto());
+		var dto = (items, total).ToPagedResult(pageNumber, pageSize, r => r.ToDto());
 			return ApiResponse<PagedResult<ReservationDto>>.Success(dto);
 		}
 
@@ -158,14 +157,14 @@ namespace FoodDonationSystem.Core.Services
 				});
 			}
 
-			var (items, total) = await _unitOfWork.Reservations.GetPagedAsync(
-				pageNumber,
-				pageSize,
-				r => donationIds.Contains(r.DonationId),
-				orderBy: r => r.CreatedAt,
-				orderByDescending: true);
+		var (items, total) = await _unitOfWork.Reservations.GetPagedWithDetailsAsync(
+			pageNumber,
+			pageSize,
+			r => donationIds.Contains(r.DonationId),
+			orderBy: r => r.CreatedAt,
+			orderByDescending: true);
 
-			var dto = (items, total).ToPagedResult(pageNumber, pageSize, r => r.ToDto());
+		var dto = (items, total).ToPagedResult(pageNumber, pageSize, r => r.ToDto());
 			return ApiResponse<PagedResult<ReservationDto>>.Success(dto);
 		}
 	}

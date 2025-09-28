@@ -17,6 +17,7 @@ namespace FoodDonationSystem.Data.UnitOfWork
         private IRestaurantRepository? _restaurants;
         private ICharityRepository? _charities;
         private IDonationRepository? _donations;
+        private IReservationRepository? _reservations;
         private readonly Dictionary<Type, object> _repositories = new();
 
 
@@ -30,8 +31,8 @@ namespace FoodDonationSystem.Data.UnitOfWork
         public ICharityRepository Charities =>
             _charities ??= new CharityRepository(_context);
         public IDonationRepository Donations => _donations ??= new DonationRepository(_context);
+        public IReservationRepository Reservations => _reservations ??= new ReservationRepository(_context);
         public IGenericRepository<DonationImage> DonationImages => Repository<DonationImage>();
-        public IGenericRepository<Reservation> Reservations => Repository<Reservation>();
         public IGenericRepository<RestaurantSchedule> RestaurantSchedules => Repository<RestaurantSchedule>();
         public IGenericRepository<Volunteer> Volunteers => Repository<Volunteer>();
         public IGenericRepository<VolunteerArea> VolunteerAreas => Repository<VolunteerArea>();

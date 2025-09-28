@@ -9,7 +9,7 @@ namespace FoodDonationSystem.Core.Interfaces
         ICharityRepository Charities { get; }
         IDonationRepository Donations { get; }
         IGenericRepository<DonationImage> DonationImages { get; }
-        IGenericRepository<Reservation> Reservations { get; }
+        IReservationRepository Reservations { get; }
         IGenericRepository<RestaurantSchedule> RestaurantSchedules { get; }
         IGenericRepository<Volunteer> Volunteers { get; }
         IGenericRepository<VolunteerArea> VolunteerAreas { get; }
