@@ -1,4 +1,5 @@
 using FoodDonationSystem.Core.Enums;
+using FoodDonationSystem.Core.Extensions;
 
 namespace FoodDonationSystem.Core.DTOs.Donation
 {
@@ -10,6 +11,8 @@ namespace FoodDonationSystem.Core.DTOs.Donation
         public int EstimatedServings { get; set; }
         public DateTime ExpiryDateTime { get; set; }
         public DonationStatus Status { get; set; }
+        public string StatusDisplayName => Status.ToDisplayName();
+
         public bool RequiresPickup { get; set; }
         public string? SpecialInstructions { get; set; }
         public string? ContactPerson { get; set; }
