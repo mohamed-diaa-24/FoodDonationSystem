@@ -25,6 +25,7 @@ namespace FoodDonationSystem.API.Controllers
         #region Restaurant Donation Management
 
         [HttpPost]
+        [Authorize(Roles = "Restaurant")]
         public async Task<ActionResult<ApiResponse<DonationDto>>> CreateDonation([FromForm] CreateDonationDto request)
         {
             var userId = GetCurrentUserId();
@@ -34,6 +35,7 @@ namespace FoodDonationSystem.API.Controllers
 
 
         [HttpGet("my-donations")]
+        [Authorize(Roles = "Restaurant")]
         public async Task<ActionResult<ApiResponse<PagedResult<DonationDto>>>> GetMyDonations(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
@@ -44,6 +46,7 @@ namespace FoodDonationSystem.API.Controllers
         }
 
         [HttpPut("{donationId}")]
+        [Authorize(Roles = "Restaurant")]
         public async Task<ActionResult<ApiResponse<DonationDto>>> UpdateDonation(
             int donationId,
             [FromBody] UpdateDonationDto request)
@@ -55,6 +58,7 @@ namespace FoodDonationSystem.API.Controllers
 
 
         [HttpDelete("{donationId}")]
+        [Authorize(Roles = "Restaurant")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteDonation(int donationId)
         {
             var userId = GetCurrentUserId();
@@ -64,11 +68,11 @@ namespace FoodDonationSystem.API.Controllers
 
         #endregion
 
-        #region Public Donation Browsing
+        #region Charity Management
 
 
         [HttpGet("available")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Charity")]
         public async Task<ActionResult<ApiResponse<PagedResult<DonationDto>>>> GetAvailableDonations(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
@@ -79,7 +83,7 @@ namespace FoodDonationSystem.API.Controllers
 
 
         [HttpGet("nearby")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Charity")]
         public async Task<ActionResult<ApiResponse<PagedResult<DonationDto>>>> GetNearbyDonations(
             [FromQuery] double? latitude,
             [FromQuery] double? longitude,
@@ -110,7 +114,7 @@ namespace FoodDonationSystem.API.Controllers
         }
 
         [HttpGet("{donationId}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Charity")]
         public async Task<ActionResult<ApiResponse<DonationDto>>> GetDonationById(int donationId)
         {
             var result = await _donationService.GetDonationByIdAsync(donationId);
@@ -121,6 +125,7 @@ namespace FoodDonationSystem.API.Controllers
 
         #region Image Management
         [HttpDelete("{donationId}/images/{imageId}")]
+        [Authorize(Roles = "Restaurant")]
         public async Task<ActionResult<ApiResponse<bool>>> RemoveDonationImage(int donationId, int imageId)
         {
             var userId = GetCurrentUserId();
@@ -129,7 +134,6 @@ namespace FoodDonationSystem.API.Controllers
         }
 
         [HttpGet("{donationId}/images")]
-        [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<List<DonationImageDto>>>> GetDonationImages(int donationId)
         {
             try
