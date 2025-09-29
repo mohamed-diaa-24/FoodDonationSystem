@@ -1,4 +1,7 @@
 ﻿using FoodDonationSystem.API.Seed;
+using FoodDonationSystem.Core.Entities;
+using FoodDonationSystem.Data.Context;
+using Microsoft.AspNetCore.Identity;
 
 namespace FoodDonationSystem.API.Extensions
 {
@@ -122,11 +125,17 @@ namespace FoodDonationSystem.API.Extensions
                 var logger = app.Services.GetRequiredService<ILogger<Program>>();
                 var enviroment = app.Services.GetRequiredService<IWebHostEnvironment>();
 
-                // Seed all other data
-                await DataSeeder.SeedAllData(app.Services, logger, enviroment);
+                using var scope = app.Services.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                var RoleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+                RoleSeeder.SeedAsync(RoleManager, logger);
 
-                // Seed roles and admin user first
-                //await DataSeeder.SeedRoles(app.Services, logger);
+                if (enviroment.IsDevelopment())
+                {
+                    RoleSeeder.SeedAdminUser(userManager, logger);
+                }
+
                 logger.LogInformation("All data seeding completed successfully");
             }
             catch (Exception ex)

@@ -40,8 +40,8 @@ namespace FoodDonationSystem.API.Seed
 
         public static async Task SeedAdminUser(UserManager<ApplicationUser> userManager, ILogger logger)
         {
-            const string adminEmail = "admin@fooddonation.com";
-            const string adminPassword = "Admin@123456";
+            const string adminEmail = "admin.dev@test.test";
+            const string adminPassword = "Admin@123";
 
             try
             {
