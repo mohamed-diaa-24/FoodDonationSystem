@@ -10,16 +10,13 @@ namespace FoodDonationSystem.Core.Enums
         [Description("محجوز")]
         Reserved = 2,
 
-        [Description("قيد التوصيل")]
-        InProgress = 3,
-
         [Description("مكتمل")]
-        Completed = 4,
+        Completed = 3,
 
         [Description("منتهي الصلاحية")]
-        Expired = 5,
+        Expired = 4,
 
         [Description("ملغي")]
-        Cancelled = 6
+        Cancelled = 5
     }
 }

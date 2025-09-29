@@ -1,9 +1,4 @@
-﻿using FoodDonationSystem.API.Seed;
-using FoodDonationSystem.Core.Entities;
-using FoodDonationSystem.Data.Context;
-using Microsoft.AspNetCore.Identity;
-
-namespace FoodDonationSystem.API.Extensions
+﻿namespace FoodDonationSystem.API.Extensions
 {
     public static class WebApplicationExtensions
     {
@@ -118,35 +113,6 @@ namespace FoodDonationSystem.API.Extensions
             return app;
         }
 
-        public static async Task<WebApplication> SeedDataAsync(this WebApplication app)
-        {
-            try
-            {
-                var logger = app.Services.GetRequiredService<ILogger<Program>>();
-                var enviroment = app.Services.GetRequiredService<IWebHostEnvironment>();
-
-                using var scope = app.Services.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                var RoleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-                RoleSeeder.SeedAsync(RoleManager, logger);
-
-                if (enviroment.IsDevelopment())
-                {
-                    RoleSeeder.SeedAdminUser(userManager, logger);
-                }
-
-                logger.LogInformation("All data seeding completed successfully");
-            }
-            catch (Exception ex)
-            {
-                var logger = app.Services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An error occurred while seeding data");
-            }
-
-            return app;
-        }
-
 
         public static async Task<WebApplication> ConfigurePipelineAsync(this WebApplication app)
         {
@@ -171,9 +137,6 @@ namespace FoodDonationSystem.API.Extensions
 
 
             app.UseApiEndpoints();
-
-
-            await app.SeedDataAsync();
 
             return app;
         }
