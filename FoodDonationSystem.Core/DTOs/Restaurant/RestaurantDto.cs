@@ -1,4 +1,5 @@
-﻿using FoodDonationSystem.Core.Enums;
+﻿using FoodDonationSystem.Core.DTOs.Donation;
+using FoodDonationSystem.Core.Enums;
 using FoodDonationSystem.Core.Extensions;
 
 namespace FoodDonationSystem.Core.DTOs.Restaurant
@@ -21,5 +22,8 @@ namespace FoodDonationSystem.Core.DTOs.Restaurant
         public string OwnerName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
+
+        public string ImagePath { get; set; } = string.Empty;
+
     }
 }

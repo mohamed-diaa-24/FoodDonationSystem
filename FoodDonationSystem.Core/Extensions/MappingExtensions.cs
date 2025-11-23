@@ -45,11 +45,12 @@ namespace FoodDonationSystem.Core.Extensions
                 CreatedAt = restaurant.CreatedAt,
                 OwnerName = restaurant.User != null ? $"{restaurant.User.FirstName} {restaurant.User.LastName}" : "",
                 Email = restaurant.User?.Email ?? "",
-                PhoneNumber = restaurant.User?.PhoneNumber ?? ""
+                PhoneNumber = restaurant.User?.PhoneNumber ?? "",
+                ImagePath = restaurant.ImageUrl
             };
         }
 
-
+      
         public static CreateRestaurantDto ToCreateRestaurantDto(this CreateRestaurantRequest request)
         {
             return new CreateRestaurantDto

@@ -52,6 +52,7 @@ namespace FoodDonationSystem.Core.Services
             try
             {
                 var restaurant = await _unitOfWork.Restaurants.GetByUserIdAsync(userId);
+                //var restaurant = await _unitOfWork.Restaurants.GetByIdWithImagesAsync(userId);
                 if (restaurant == null)
                 {
                     return ApiResponse<RestaurantDto>.Failure("لم يتم العثور على المطعم");
@@ -260,10 +261,6 @@ namespace FoodDonationSystem.Core.Services
         }
 
 
-
-
-
-
         public async Task<ApiResponse<PagedResult<RestaurantDto>>> GetRestaurantsForAdminAsync(
             int pageNumber, int pageSize, ApprovalStatus? status = null, string? searchTerm = null)
         {
@@ -282,5 +279,7 @@ namespace FoodDonationSystem.Core.Services
                 return ApiResponse<PagedResult<RestaurantDto>>.Failure($"خطأ في استرداد المطاعم: {ex.Message}");
             }
         }
+
+
     }
 }

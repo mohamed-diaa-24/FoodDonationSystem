@@ -21,5 +21,7 @@ namespace FoodDonationSystem.Core.Entities
         public ApplicationUser User { get; set; } = null!;
         public ICollection<Donation> Donations { get; set; } = new List<Donation>();
         public ICollection<RestaurantSchedule> Schedules { get; set; } = new List<RestaurantSchedule>();
+       public string ImageUrl { get; set; } = string.Empty;
+
     }
 }
