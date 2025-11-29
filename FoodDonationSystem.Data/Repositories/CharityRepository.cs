@@ -17,6 +17,7 @@ namespace FoodDonationSystem.Data.Repositories
             return await _dbSet
                 .Include(c => c.User)
                 .Include(c => c.Needs)
+                .Include(c => c.Images)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
         }
 
@@ -24,6 +25,7 @@ namespace FoodDonationSystem.Data.Repositories
         {
             return await _dbSet
                 .Include(c => c.User)
+                .Include(c => c.Images)
                 .Where(c => c.Status == ApprovalStatus.Approved && c.IsActive)
                 .ToListAsync();
         }
@@ -32,6 +34,7 @@ namespace FoodDonationSystem.Data.Repositories
         {
             return await _dbSet
                 .Include(c => c.User)
+                .Include(c => c.Images)
                 .Where(c => c.Status == ApprovalStatus.Approved && c.IsActive)
                 .Where(c =>
                     (6371 * Math.Acos(
@@ -48,6 +51,7 @@ namespace FoodDonationSystem.Data.Repositories
         {
             return await _dbSet
                 .Include(c => c.User)
+                .Include(c => c.Images)
                 .Where(c => c.Type == type && c.Status == ApprovalStatus.Approved && c.IsActive)
                 .ToListAsync();
         }
@@ -67,7 +71,10 @@ namespace FoodDonationSystem.Data.Repositories
         public async Task<(IEnumerable<Charity> Charities, int TotalCount)> GetCharitiesForAdminAsync(
             int pageNumber, int pageSize, ApprovalStatus? status = null, string? searchTerm = null)
         {
-            var query = _dbSet.Include(c => c.User).AsQueryable();
+            var query = _dbSet
+                .Include(c => c.User)
+                .Include(c => c.Images)
+                .AsQueryable();
 
             if (status.HasValue)
                 query = query.Where(c => c.Status == status.Value);
