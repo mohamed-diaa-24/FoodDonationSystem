@@ -32,8 +32,24 @@ namespace FoodDonationSystem.Data.Repositories
         public async Task<IEnumerable<Donation>> GetByRestaurantIdAsync(int restaurantId)
         {
             return await _context.Donations
+                .Include(d => d.Restaurant)
                 .Include(d => d.Images)
+                .Include(d => d.Reservations)
                 .Where(d => d.RestaurantId == restaurantId && !d.IsDeleted)
+                .OrderByDescending(d => d.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetAvailableDonationsByRestaurantIdAsync(int restaurantId)
+        {
+            return await _context.Donations
+                .Include(d => d.Restaurant)
+                .Include(d => d.Images)
+                .Include(d => d.Reservations)
+                .Where(d => d.RestaurantId == restaurantId &&
+                           d.Status == DonationStatus.Available &&
+                           d.ExpiryDateTime > DateTime.UtcNow &&
+                           !d.IsDeleted)
                 .OrderByDescending(d => d.CreatedAt)
                 .ToListAsync();
         }

@@ -9,6 +9,7 @@ namespace FoodDonationSystem.Core.Interfaces.IRepositories
         Task<Donation?> GetByIdWithDetailsAsync(int id);
         Task<Donation?> GetByIdWithImagesAsync(int id);
         Task<IEnumerable<Donation>> GetByRestaurantIdAsync(int restaurantId);
+        Task<IEnumerable<Donation>> GetAvailableDonationsByRestaurantIdAsync(int restaurantId);
         Task<IEnumerable<Donation>> GetByUserIdAsync(Guid userId);
         Task<IEnumerable<Donation>> GetAvailableDonationsAsync();
         Task<IEnumerable<Donation>> GetExpiredDonationsAsync();

@@ -45,6 +45,17 @@ namespace FoodDonationSystem.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("restaurant/{restaurantId}")]
+        [Authorize]
+        public async Task<ActionResult<ApiResponse<PagedResult<DonationDto>>>> GetDonationsByRestaurantId(
+            int restaurantId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var result = await _donationService.GetDonationsByRestaurantIdAsync(restaurantId, pageNumber, pageSize);
+            return Ok(result);
+        }
+
         [HttpPut("{donationId}")]
         [Authorize(Roles = "Restaurant")]
         public async Task<ActionResult<ApiResponse<DonationDto>>> UpdateDonation(

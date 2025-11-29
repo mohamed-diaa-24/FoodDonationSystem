@@ -224,6 +224,21 @@ namespace FoodDonationSystem.Core.Services
             }
         }
 
+        public async Task<ApiResponse<PagedResult<DonationDto>>> GetDonationsByRestaurantIdAsync(int restaurantId, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                var donations = await _unitOfWork.Donations.GetAvailableDonationsByRestaurantIdAsync(restaurantId);
+                var result = donations.ToManualPagedResult(pageNumber, pageSize, d => d.ToDto());
+
+                return ApiResponse<PagedResult<DonationDto>>.Success(result, "تم استرداد التبرعات المتاحة للمطعم بنجاح");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PagedResult<DonationDto>>.Failure($"خطأ في استرداد تبرعات المطعم: {ex.Message}");
+            }
+        }
+
 
         public async Task<ApiResponse<PagedResult<DonationDto>>> GetAvailableDonationsAsync(int pageNumber = 1, int pageSize = 10)
         {

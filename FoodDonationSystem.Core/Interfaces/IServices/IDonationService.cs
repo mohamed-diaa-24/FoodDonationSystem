@@ -15,6 +15,7 @@ namespace FoodDonationSystem.Core.Interfaces.IServices
 
         // Restaurant Donation Management
         Task<ApiResponse<PagedResult<DonationDto>>> GetMyDonationsAsync(Guid userId, int pageNumber = 1, int pageSize = 10);
+        Task<ApiResponse<PagedResult<DonationDto>>> GetDonationsByRestaurantIdAsync(int restaurantId, int pageNumber = 1, int pageSize = 10);
 
         // Public Donation Browsing
         Task<ApiResponse<PagedResult<DonationDto>>> GetAvailableDonationsAsync(int pageNumber = 1, int pageSize = 10);
