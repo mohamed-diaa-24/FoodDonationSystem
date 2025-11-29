@@ -22,5 +22,8 @@ namespace FoodDonationSystem.Core.DTOs.Charity
         public string ContactName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
+
+        // Images
+        public List<CharityImageDto> Images { get; set; } = new List<CharityImageDto>();
     }
 }

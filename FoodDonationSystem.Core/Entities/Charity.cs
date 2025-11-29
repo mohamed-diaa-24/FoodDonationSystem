@@ -23,5 +23,6 @@ namespace FoodDonationSystem.Core.Entities
         public ApplicationUser User { get; set; } = null!;
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
         public ICollection<CharityNeed> Needs { get; set; } = new List<CharityNeed>();
+        public ICollection<CharityImage> Images { get; set; } = new List<CharityImage>();
     }
 }

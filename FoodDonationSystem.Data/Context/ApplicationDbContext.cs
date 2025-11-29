@@ -13,6 +13,7 @@ namespace FoodDonationSystem.Data.Context
 
         #region Tabels
         public DbSet<Charity> Charities { get; set; }
+        public DbSet<CharityImage> CharityImages { get; set; }
         public DbSet<CharityNeed> CharityNeeds { get; set; }
         public DbSet<Delivery> Deliveries { get; set; }
         public DbSet<Donation> Donations { get; set; }

@@ -186,7 +186,8 @@ namespace FoodDonationSystem.Core.Extensions
                 CreatedAt = charity.CreatedAt,
                 ContactName = charity.User != null ? $"{charity.User.FirstName} {charity.User.LastName}" : "",
                 Email = charity.User?.Email ?? "",
-                PhoneNumber = charity.User?.PhoneNumber ?? ""
+                PhoneNumber = charity.User?.PhoneNumber ?? "",
+                Images = charity.Images?.Select(i => i.ToDto()).ToList() ?? new List<CharityImageDto>()
             };
         }
 
@@ -348,6 +349,25 @@ namespace FoodDonationSystem.Core.Extensions
                 ImagePath = dto.ImagePath,
                 IsPrimary = dto.IsPrimary
             };
+        }
+        #endregion
+
+        #region CharityImageMapping
+        public static CharityImageDto ToDto(this CharityImage image)
+        {
+            return new CharityImageDto
+            {
+                Id = image.Id,
+                ImagePath = image.ImagePath,
+                IsPrimary = image.IsPrimary,
+                CharityId = image.CharityId,
+                CreatedAt = image.CreatedAt
+            };
+        }
+
+        public static IEnumerable<CharityImageDto> ToDto(this IEnumerable<CharityImage> images)
+        {
+            return images.Select(i => i.ToDto());
         }
         #endregion
 
